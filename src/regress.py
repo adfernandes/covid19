@@ -83,7 +83,7 @@ for country_region in country_regions:
 # %% Set up the plots
 
 sns.set()
-palette = sns.color_palette("Paired")
+palette = sns.color_palette("colorblind")
 
 plt.rcParams['figure.figsize'] = [11, 8.5]
 
@@ -96,48 +96,58 @@ n_days_back_plot = 7 * 6 + 1
 country_region = 'US'
 
 marker_color = {
-    'confirmed': palette[1],
-    'deaths': palette[5],
-    'recovered': palette[3],
+    'confirmed': palette[0],
+    'deaths': palette[3],
+    'recovered': palette[2],
 }
 
 line_color = {
-    'confirmed': palette[0],
-    'deaths': palette[4],
-    'recovered': palette[2],
+    'confirmed': palette[9],
+    'deaths': palette[1],
+    'recovered': palette[8],
 }
 
 markersize = 16.0
 linewidth = 4.0
 
-fig, ax = plt.subplots()  # FIXME (Needs to loop) BEGIN
+#|fig, ax = plt.subplots()  # FIXME (Needs to loop) BEGIN
 
 latest_date = max([data[country_region][status].index[-1].to_pydatetime().date() for status in statuses])
 latest_date_str = latest_date.strftime('%B %d, %Y')
 
 plt.title(f"{country_region} Counts as of {latest_date_str}")
 
-for status in statuses:
-    df = data[country_region][status].iloc[-(n_days_back_plot + 1):-1]
-    ax.semilogy(df.index.to_pydatetime(), df['count'] + epsilon, '.', color=marker_color[status], markersize=markersize)
+
+def plot_markers():
+    for status in statuses:
+        df = data[country_region][status].iloc[-(n_days_back_plot + 1):-1]
+        ax.semilogy(df.index.to_pydatetime(), df['count'] + epsilon, '.', color=marker_color[status], markersize=markersize)
+
+
+plot_markers()  # plot the markers and set the axes
 
 for status in statuses:
+    df = data[country_region][status]
     rgi = regression[country_region][status]['interpolation']
     ax.semilogy(rgi['dates'], rgi['count'], color=line_color[status], linestyle='-', linewidth=linewidth)
     rge = regression[country_region][status]['extrapolation']
     ax.semilogy(rge['dates'], rge['count'], color=line_color[status], linestyle=':', linewidth=linewidth)
     for index in range(-3,0):
-        va = 'bottom'
-        annotation = f"{int(rge['count'][index] + 0.5):,}\n"
-        if index != -3:
-            va = 'center'
-            annotation = annotation + rge['dates'][index].to_pydatetime().date().strftime('%b %d')
+        annotation_date = rge['dates'][index].to_pydatetime().date().strftime('%b %d')
+        annotation_count = f"{int(rge['count'][index] + 0.5):,}"
+        annotation = f"{annotation_count}\n{annotation_date}"
+        va = 'center'
+        if index == -3 and df.iloc[-3]['count'] > 0:
+            annotation = f"{annotation}\n"
+            va = 'bottom'
         plt.annotate(annotation, xy=(rge['dates'][index], rge['count'][index]),
                      fontweight='bold', ha='center', va=va)
 
+plot_markers()  # replot the markers so they are on top of the lines
+
 ax.get_xaxis().set_major_locator(mpl.dates.WeekdayLocator(byweekday=mpl.dates.MONDAY))
 ax.get_xaxis().set_major_formatter(mpl.dates.DateFormatter('%b %d'))
-ax.set_xlabel("Date in 2020", labelpad=12)
+ax.set_xlabel(f"Date", labelpad=12)
 
 ax.set_ylim(ymin=1)
 ax.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
