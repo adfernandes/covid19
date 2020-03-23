@@ -53,7 +53,7 @@ n_days_extrapolate = [-n_days_back_fit, 0, 7, 14]
 
 def regress(df: pd.DataFrame):
 
-    df = df.iloc[-(n_days_back_fit + 2): -1]
+    df = df.iloc[-(n_days_back_fit + 1):]
 
     reg = LinearRegression()
     reg.fit(df['days'].values.reshape(-1, 1), df['log2count'].values.reshape(-1, 1),
@@ -64,7 +64,7 @@ def regress(df: pd.DataFrame):
 
     dates = [df.index[-1] + n_days * df.index.freq for n_days in n_days_extrapolate]
     days = [df.iloc[-1]['days'] + n_days for n_days in n_days_extrapolate]
-    log2count = reg.predict(np.array(days).reshape(-1, 1))[:,0]
+    log2count = reg.predict(np.array(days).reshape(-1, 1))[:, 0]
     count = np.exp2(log2count)
 
     return {
@@ -115,12 +115,12 @@ linewidth = 4.0
 latest_date = max([data[country_region][status].index[-1].to_pydatetime().date() for status in statuses])
 latest_date_str = latest_date.strftime('%B %d, %Y')
 
-plt.title(f"{country_region} Counts as of {latest_date_str}")
+plt.title(f"{country_region} Counts as of {latest_date_str} UTC End of Day")
 
 
 def plot_markers():
     for status in statuses:
-        df = data[country_region][status].iloc[-(n_days_back_plot + 1):-1]
+        df = data[country_region][status].iloc[-(n_days_back_plot + 1):]
         ax.semilogy(df.index.to_pydatetime(), df['count'] + epsilon, '.', color=marker_color[status], markersize=markersize)
 
 
