@@ -13,9 +13,9 @@ from sklearn.linear_model import LinearRegression
 
 # %% Basic setup
 
-epsilon = 0.001
+epsilon = np.sqrt(np.finfo(float).eps)
 
-country_regions = [
+countries = [
     'US',
     'Canada',
     'Italy',
@@ -28,36 +28,41 @@ country_regions = [
 
 # %% Load the data
 
-data_full = pd.read_parquet("data/combined.parquet")
-data_country_region = data_full.drop(columns=['province_state', 'state', 'city', 'county', 'lat', 'lon'])
+ts_global = {
+    'confirmed': pd.read_csv("https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv", header=0, index_col=1),
+    'deaths': pd.read_csv("https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv", header=0, index_col=1),
+}
 
-statuses = sorted(list(set(data_country_region['status'].values)))
+for status in ts_global:
+    ts_global[status] = ts_global[status].drop(columns=['Province/State', 'Lat', 'Long']).transpose()
+    ts_global[status].index = pd.to_datetime(ts_global[status].index, dayfirst=False, yearfirst=False, utc=True)
+    ts_global[status] = ts_global[status].groupby(ts_global[status].columns, axis='columns').aggregate(np.sum)
+    ts_global[status] = ts_global[status].asfreq('D')
+
+statuses = sorted(list(set(ts_global)))
 
 data = {}
-for country_region in country_regions:
-    data[country_region] = {}
+for country in countries:
+    data[country] = {}
     for status in statuses:
-        location = (data_country_region['status'] == status) & (data_country_region['country_region'] == country_region)
-        data[country_region][status] = data_country_region.loc[location].drop(columns=['status', 'country_region'])
-        data[country_region][status] = data[country_region][status].groupby(['date']).sum().asfreq('D')
-        data[country_region][status]['days'] = data[country_region][status].index.to_julian_date().tolist()
-        data[country_region][status]['days'] = data[country_region][status]['days'] - np.min(data[country_region][status]['days'])
-        data[country_region][status]['log2count'] = np.log2(data[country_region][status]['count'] + epsilon)
-        del location
+        data[country][status] = pd.DataFrame(ts_global[status][country]).rename(columns={country: "count"})
+        data[country][status]['days'] = data[country][status].index.to_julian_date().tolist()
+        data[country][status]['days'] = data[country][status]['days'] - np.min(data[country][status]['days'])
+        data[country][status]['log2count'] = np.log2(data[country][status]['count'] + epsilon)
 
 # %% Fit the regression models
 
-n_days_back_fit = 7 * 2 + 1
+n_days_back_fit = 9
 n_days_extrapolate = [-n_days_back_fit, 0, 7, 14]
 
 
 def regress(df: pd.DataFrame):
 
-    df = df.iloc[-(n_days_back_fit + 1):]
+    df = df.iloc[-n_days_back_fit:]
 
     reg = LinearRegression()
     reg.fit(df['days'].values.reshape(-1, 1), df['log2count'].values.reshape(-1, 1),
-            sample_weight=np.linspace(0.0, 1.0, n_days_back_fit + 1) * (df['count'].values > 0.0))
+            sample_weight=np.logspace(0.0, 1.0, n_days_back_fit) * (df['count'].values > 0.0))
 
     log2_weekly_multiplier = 7 * reg.coef_[0][0]
     weekly_multiplier = np.exp2(log2_weekly_multiplier)
@@ -75,10 +80,10 @@ def regress(df: pd.DataFrame):
 
 
 regression = {}
-for country_region in country_regions:
-    regression[country_region] = {}
+for country in countries:
+    regression[country] = {}
     for status in statuses:
-        regression[country_region][status] = regress(data[country_region][status])
+        regression[country][status] = regress(data[country][status])
 
 # %% Set up the plots
 
@@ -89,22 +94,20 @@ plt.rcParams['figure.figsize'] = [11, 8.5]
 
 fig, ax = plt.subplots()
 
-n_days_back_plot = 7 * 6 + 1
+n_days_back_plot = 7 * 6
 
 # %% Plot the data and regressions
 
-country_region = 'US'
+country = 'US'
 
 marker_color = {
     'confirmed': palette[0],
     'deaths': palette[3],
-    'recovered': palette[2],
 }
 
 line_color = {
     'confirmed': palette[9],
     'deaths': palette[1],
-    'recovered': palette[8],
 }
 
 markersize = 16.0
@@ -112,25 +115,25 @@ linewidth = 4.0
 
 #|fig, ax = plt.subplots()  # FIXME (Needs to loop) BEGIN
 
-latest_date = max([data[country_region][status].index[-1].to_pydatetime().date() for status in statuses])
+latest_date = max([data[country][status].index[-1].to_pydatetime().date() for status in statuses])
 latest_date_str = latest_date.strftime('%B %d, %Y')
 
-plt.title(f"{country_region} Counts as of {latest_date_str} UTC End of Day")
+plt.title(f"{country} Counts as of {latest_date_str} UTC End of Day")
 
 
 def plot_markers():
     for status in statuses:
-        df = data[country_region][status].iloc[-(n_days_back_plot + 1):]
+        df = data[country][status].iloc[-(n_days_back_plot + 1):]
         ax.semilogy(df.index.to_pydatetime(), df['count'] + epsilon, '.', color=marker_color[status], markersize=markersize)
 
 
 plot_markers()  # plot the markers and set the axes
 
 for status in statuses:
-    df = data[country_region][status]
-    rgi = regression[country_region][status]['interpolation']
+    df = data[country][status]
+    rgi = regression[country][status]['interpolation']
     ax.semilogy(rgi['dates'], rgi['count'], color=line_color[status], linestyle='-', linewidth=linewidth)
-    rge = regression[country_region][status]['extrapolation']
+    rge = regression[country][status]['extrapolation']
     ax.semilogy(rge['dates'], rge['count'], color=line_color[status], linestyle=':', linewidth=linewidth)
     for index in range(-3,0):
         annotation_date = rge['dates'][index].to_pydatetime().date().strftime('%b %d')
