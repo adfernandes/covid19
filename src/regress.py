@@ -14,8 +14,6 @@ from sklearn.linear_model import LinearRegression
 
 # %% Basic setup
 
-epsilon = np.sqrt(np.finfo(float).eps)
-
 countries = [
     'US',
     'Canada',
@@ -42,6 +40,9 @@ for status in ts_global:
 
 statuses = sorted(list(set(ts_global)))
 
+
+countries = sorted(list(set(ts_global['confirmed'].columns.tolist()) & set(ts_global['deaths'].columns.tolist())))
+
 data = {}
 for country in countries:
     data[country] = {}
@@ -49,12 +50,22 @@ for country in countries:
         data[country][status] = pd.DataFrame(ts_global[status][country]).rename(columns={country: "count"})
         data[country][status]['days'] = data[country][status].index.to_julian_date().tolist()
         data[country][status]['days'] = data[country][status]['days'] - np.min(data[country][status]['days'])
-        data[country][status]['log2count'] = np.log2(data[country][status]['count'] + epsilon)
+        data[country][status]['log2count'] = np.log2(data[country][status]['count'])
 
 # %% Fit the regression models
 
 n_days_back_fit = 9
 n_days_extrapolate = [-n_days_back_fit, 0, 7, 14]
+
+too_few = set()
+for country in countries:
+    for status in statuses:
+        if any(data[country][status]['count'][-n_days_back_fit:] < 1):
+            too_few.add(country)
+print(f"too_few: {sorted(list(too_few))}")
+for remove in too_few:
+    del data[remove]
+countries = sorted(list(set(countries) - too_few))
 
 
 def regress(df: pd.DataFrame):
@@ -62,7 +73,7 @@ def regress(df: pd.DataFrame):
     df = df.iloc[-n_days_back_fit:]
 
     reg = LinearRegression()
-    sample_weight = np.linspace(0.5, 1.0, n_days_back_fit) * (df['count'].values >= 1.0)
+    sample_weight = np.linspace(0.25, 1.0, n_days_back_fit) * (df['count'].values >= 1.0)
     reg.fit(df['days'].values.reshape(-1, 1), df['log2count'].values.reshape(-1, 1), sample_weight=sample_weight)
 
     log2_weekly_multiplier = 7 * reg.coef_[0][0]
@@ -132,7 +143,7 @@ for country in countries:
     def plot_markers():
         for status in statuses:
             df = data[country][status].iloc[-(n_days_back_plot + 1):]
-            ax.semilogy(df.index.to_pydatetime(), df['count'] + epsilon, '.', color=marker_color[status], markersize=markersize)
+            ax.semilogy(df.index.to_pydatetime(), df['count'], '.', color=marker_color[status], markersize=markersize)
 
 
     plot_markers()  # plot the markers and set the axes
