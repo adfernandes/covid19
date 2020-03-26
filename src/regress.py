@@ -61,8 +61,8 @@ def regress(df: pd.DataFrame):
     df = df.iloc[-n_days_back_fit:]
 
     reg = LinearRegression()
-    reg.fit(df['days'].values.reshape(-1, 1), df['log2count'].values.reshape(-1, 1),
-            sample_weight=np.logspace(0.0, 1.0, n_days_back_fit) * (df['count'].values > 0.0))
+    sample_weight = np.linspace(0.5, 1.0, n_days_back_fit) * (df['count'].values >= 1.0)
+    reg.fit(df['days'].values.reshape(-1, 1), df['log2count'].values.reshape(-1, 1), sample_weight=sample_weight)
 
     log2_weekly_multiplier = 7 * reg.coef_[0][0]
     weekly_multiplier = np.exp2(log2_weekly_multiplier)
@@ -115,11 +115,14 @@ linewidth = 4.0
 
 #|fig, ax = plt.subplots()  # FIXME (Needs to loop) BEGIN
 
+#axs = ax.twinx()  # https://github.com/matplotlib/matplotlib/issues/16405
+#axs.get_yaxis().set_major_locator(plt.NullLocator())
+#axs.get_yaxis().set_major_formatter(plt.NullFormatter())
+
 latest_date = max([data[country][status].index[-1].to_pydatetime().date() for status in statuses])
 latest_date_str = latest_date.strftime('%B %d, %Y')
 
-plt.title(f"{country} Counts as of {latest_date_str} UTC End of Day")
-
+plt.title(f"{country} COVID-19 Cases as of {latest_date_str} UTC EOD, JHU CSSE Data")
 
 def plot_markers():
     for status in statuses:
@@ -133,6 +136,7 @@ for status in statuses:
     df = data[country][status]
     rgi = regression[country][status]['interpolation']
     ax.semilogy(rgi['dates'], rgi['count'], color=line_color[status], linestyle='-', linewidth=linewidth)
+for status in statuses:
     rge = regression[country][status]['extrapolation']
     ax.semilogy(rge['dates'], rge['count'], color=line_color[status], linestyle=':', linewidth=linewidth)
     for index in range(-3,0):
@@ -156,14 +160,20 @@ ax.set_ylim(ymin=1)
 ax.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
 ax.set_ylabel("People")
 
+#axs.get_yaxis().set_ticks(rge['count'])
+
 plt.grid(b=True, which='major', axis='x', linewidth=1.0)
 plt.grid(b=True, which='major', axis='y', linewidth=1.0)
 plt.grid(b=True, which='minor', axis='y', linewidth=0.5)
 
-fig.legend([label.title() for label in statuses], loc='upper left', bbox_to_anchor=(0.11, 0.950),
-           frameon=False, prop={'weight': 'bold'})
+legend_labels = [label.title() for label in statuses]
+legend_labels.append(f"{regression[country]['confirmed']['weekly_multiplier']:.1f} $\\times$ per week")
+legend_labels.append(f"{regression[country]['deaths']['weekly_multiplier']:.1f} $\\times$ per week")
+fig.legend(legend_labels, ncol=2, frameon=False, prop={'weight': 'bold'}, loc='upper left', bbox_to_anchor=(0, 1), bbox_transform=ax.transAxes)
+
 fig.autofmt_xdate()
 
+plt.savefig(f"_{country}.png", dpi=300)
 plt.show()  # FIXME (Needs to loop) END
 
 # %% TODO Start Here!
