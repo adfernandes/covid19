@@ -1,6 +1,7 @@
 # %% Imports
 
-import datetime
+import os
+import glob
 
 import numpy as np
 import pandas as pd
@@ -92,13 +93,7 @@ palette = sns.color_palette("colorblind")
 
 plt.rcParams['figure.figsize'] = [11, 8.5]
 
-fig, ax = plt.subplots()
-
-n_days_back_plot = 7 * 6
-
-# %% Plot the data and regressions
-
-country = 'US'
+image_formats = {'svg': {}, 'pdf': {}, 'png': {'dpi': 300}}
 
 marker_color = {
     'confirmed': palette[0],
@@ -113,70 +108,80 @@ line_color = {
 markersize = 16.0
 linewidth = 4.0
 
-#|fig, ax = plt.subplots()  # FIXME (Needs to loop) BEGIN
+n_days_back_plot = 7 * 6
 
-#axs = ax.twinx()  # https://github.com/matplotlib/matplotlib/issues/16405
-#axs.get_yaxis().set_major_locator(plt.NullLocator())
-#axs.get_yaxis().set_major_formatter(plt.NullFormatter())
+# %% Plot the data and regressions
 
-latest_date = max([data[country][status].index[-1].to_pydatetime().date() for status in statuses])
-latest_date_str = latest_date.strftime('%B %d, %Y')
+for image_format in image_formats:
+    for file in glob.glob(f"plots/{image_format}/*.{image_format}"):
+        os.remove(file)
 
-plt.title(f"{country} COVID-19 Cases as of {latest_date_str} UTC EOD, JHU CSSE Data")
+for country in countries:
 
-def plot_markers():
+    fig, ax = plt.subplots()  # FIXME (Needs to loop) BEGIN
+
+    # | axs = ax.twinx() # FIXME https://github.com/matplotlib/matplotlib/issues/16405
+    # | axs.get_yaxis().set_major_locator(plt.NullLocator())
+    # | axs.get_yaxis().set_major_formatter(plt.NullFormatter())
+
+    latest_date = max([data[country][status].index[-1].to_pydatetime().date() for status in statuses])
+    latest_date_str = latest_date.strftime('%B %d, %Y')
+
+    plt.title(f"{country} COVID-19 Cases as of {latest_date_str} UTC EOD, JHU CSSE Data")
+
+    def plot_markers():
+        for status in statuses:
+            df = data[country][status].iloc[-(n_days_back_plot + 1):]
+            ax.semilogy(df.index.to_pydatetime(), df['count'] + epsilon, '.', color=marker_color[status], markersize=markersize)
+
+
+    plot_markers()  # plot the markers and set the axes
+
     for status in statuses:
-        df = data[country][status].iloc[-(n_days_back_plot + 1):]
-        ax.semilogy(df.index.to_pydatetime(), df['count'] + epsilon, '.', color=marker_color[status], markersize=markersize)
+        df = data[country][status]
+        rgi = regression[country][status]['interpolation']
+        ax.semilogy(rgi['dates'], rgi['count'], color=line_color[status], linestyle='-', linewidth=linewidth)
+    for status in statuses:
+        rge = regression[country][status]['extrapolation']
+        ax.semilogy(rge['dates'], rge['count'], color=line_color[status], linestyle=':', linewidth=linewidth)
+        for index in range(-3,0):
+            annotation_date = rge['dates'][index].to_pydatetime().date().strftime('%b %d')
+            annotation_count = f"{int(rge['count'][index] + 0.5):,}"
+            annotation = f"{annotation_count}\n{annotation_date}"
+            va = 'center'
+            if index == -3 and df.iloc[-3]['count'] > 0:
+                annotation = f"{annotation}\n"
+                va = 'bottom'
+            plt.annotate(annotation, xy=(rge['dates'][index], rge['count'][index]),
+                         fontweight='bold', ha='center', va=va)
 
+    plot_markers()  # replot the markers so they are on top of the lines
 
-plot_markers()  # plot the markers and set the axes
+    ax.get_xaxis().set_major_locator(mpl.dates.WeekdayLocator(byweekday=mpl.dates.MONDAY))
+    ax.get_xaxis().set_major_formatter(mpl.dates.DateFormatter('%b %d'))
+    ax.set_xlabel(f"Date", labelpad=12)
 
-for status in statuses:
-    df = data[country][status]
-    rgi = regression[country][status]['interpolation']
-    ax.semilogy(rgi['dates'], rgi['count'], color=line_color[status], linestyle='-', linewidth=linewidth)
-for status in statuses:
-    rge = regression[country][status]['extrapolation']
-    ax.semilogy(rge['dates'], rge['count'], color=line_color[status], linestyle=':', linewidth=linewidth)
-    for index in range(-3,0):
-        annotation_date = rge['dates'][index].to_pydatetime().date().strftime('%b %d')
-        annotation_count = f"{int(rge['count'][index] + 0.5):,}"
-        annotation = f"{annotation_count}\n{annotation_date}"
-        va = 'center'
-        if index == -3 and df.iloc[-3]['count'] > 0:
-            annotation = f"{annotation}\n"
-            va = 'bottom'
-        plt.annotate(annotation, xy=(rge['dates'][index], rge['count'][index]),
-                     fontweight='bold', ha='center', va=va)
+    ax.set_ylim(ymin=1)
+    ax.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
+    ax.set_ylabel("People")
 
-plot_markers()  # replot the markers so they are on top of the lines
+    # | axs.get_yaxis().set_ticks(rge['count']) # FIXME See the 'twinx' comment, above
+    # | Now use this to annotate the right-hand y-axis, rather than the lines
 
-ax.get_xaxis().set_major_locator(mpl.dates.WeekdayLocator(byweekday=mpl.dates.MONDAY))
-ax.get_xaxis().set_major_formatter(mpl.dates.DateFormatter('%b %d'))
-ax.set_xlabel(f"Date", labelpad=12)
+    plt.grid(b=True, which='major', axis='x', linewidth=1.0)
+    plt.grid(b=True, which='major', axis='y', linewidth=1.0)
+    plt.grid(b=True, which='minor', axis='y', linewidth=0.5)
 
-ax.set_ylim(ymin=1)
-ax.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
-ax.set_ylabel("People")
+    legend_labels = [label.title() for label in statuses]
+    legend_labels.append(f"{regression[country]['confirmed']['weekly_multiplier']:.1f} $\\times$ per week")
+    legend_labels.append(f"{regression[country]['deaths']['weekly_multiplier']:.1f} $\\times$ per week")
+    fig.legend(legend_labels, ncol=2, frameon=False, prop={'weight': 'bold'}, loc='upper left', bbox_to_anchor=(0, 1), bbox_transform=ax.transAxes)
 
-#axs.get_yaxis().set_ticks(rge['count'])
+    fig.autofmt_xdate()
 
-plt.grid(b=True, which='major', axis='x', linewidth=1.0)
-plt.grid(b=True, which='major', axis='y', linewidth=1.0)
-plt.grid(b=True, which='minor', axis='y', linewidth=0.5)
+    for image_format in image_formats:
+        plt.savefig(f"plots/{image_format}/{country}.{image_format}", **(image_formats[image_format]))
 
-legend_labels = [label.title() for label in statuses]
-legend_labels.append(f"{regression[country]['confirmed']['weekly_multiplier']:.1f} $\\times$ per week")
-legend_labels.append(f"{regression[country]['deaths']['weekly_multiplier']:.1f} $\\times$ per week")
-fig.legend(legend_labels, ncol=2, frameon=False, prop={'weight': 'bold'}, loc='upper left', bbox_to_anchor=(0, 1), bbox_transform=ax.transAxes)
+    plt.show()
 
-fig.autofmt_xdate()
-
-plt.savefig(f"_{country}.png", dpi=300)
-plt.show()  # FIXME (Needs to loop) END
-
-# %% TODO Start Here!
-
-# ax.legend([f"https://github.com/CSSEGISandData/COVID-19\nRaw Count Data (US, Confirmed) {datetime.date.today()} EOD",
-#            f"Weekly Count Multiplier: {weekly_multiplier:.2f}"])
+# %% Done
