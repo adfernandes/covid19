@@ -29,7 +29,8 @@ countries = [
 
 ts_global = {
     'confirmed': pd.read_csv("https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv", header=0, index_col=1),
-    'deaths': pd.read_csv("https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv", header=0, index_col=1),
+    'deaths':    pd.read_csv("https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv", header=0, index_col=1),
+    'recovered': pd.read_csv("https://github.com/adfernandes/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv", header=0, index_col=1),
 }
 
 for status in ts_global:
@@ -38,8 +39,7 @@ for status in ts_global:
     ts_global[status] = ts_global[status].groupby(ts_global[status].columns, axis='columns').aggregate(np.sum)
     ts_global[status] = ts_global[status].asfreq('D')
 
-statuses = sorted(list(set(ts_global)))
-
+statuses = sorted(list(set(ts_global) - set(['recovered'])))  # FIXME The 'recovered' population make the plots messy and do not increase understanding :-(
 
 countries = sorted(list(set(ts_global['confirmed'].columns.tolist()) & set(ts_global['deaths'].columns.tolist())))
 
@@ -109,11 +109,13 @@ image_formats = {'svg': {}, 'pdf': {}, 'png': {'dpi': 300}}
 marker_color = {
     'confirmed': palette[0],
     'deaths': palette[3],
+    'recovered': palette[2],
 }
 
 line_color = {
     'confirmed': palette[9],
     'deaths': palette[1],
+    'recovered': palette[8],
 }
 
 markersize = 16.0
@@ -128,6 +130,8 @@ for image_format in image_formats:
         os.remove(file)
 
 for country in countries:
+
+    print(f"plotting: {country}")
 
     fig, ax = plt.subplots()  # FIXME (Needs to loop) BEGIN
 
@@ -184,8 +188,8 @@ for country in countries:
     plt.grid(b=True, which='minor', axis='y', linewidth=0.5)
 
     legend_labels = [label.title() for label in statuses]
-    legend_labels.append(f"{regression[country]['confirmed']['weekly_multiplier']:.1f} $\\times$ per week")
-    legend_labels.append(f"{regression[country]['deaths']['weekly_multiplier']:.1f} $\\times$ per week")
+    for status in statuses:
+        legend_labels.append(f"{regression[country][status]['weekly_multiplier']:.1f} $\\times$ per week")
     fig.legend(legend_labels, ncol=2, frameon=False, prop={'weight': 'bold'}, loc='upper left', bbox_to_anchor=(0, 1), bbox_transform=ax.transAxes)
 
     fig.autofmt_xdate()
@@ -193,6 +197,6 @@ for country in countries:
     for image_format in image_formats:
         plt.savefig(f"plots/{image_format}/{country}.{image_format}", **(image_formats[image_format]))
 
-    plt.show()
+    plt.close()  # | plt.show()
 
 # %% Done
