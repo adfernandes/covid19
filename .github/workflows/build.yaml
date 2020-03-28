@@ -15,7 +15,8 @@ jobs:
       with:
         auto-update-conda: true
         auto-activate-base: true
-    - shell: bash -l {0}
+    - name: Analyze the data
+      shell: bash -l {0}
       run: |
         rm -f site/plots/*/.gitignore
         conda env create -f environment.yaml -q
