@@ -8,6 +8,7 @@ import pandas as pd
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import matplotlib.patheffects as path_effects
 import seaborn as sns
 
 from sklearn.linear_model import LinearRegression
@@ -134,6 +135,7 @@ for country in countries:
     print(f"plotting: {country}")
 
     fig, ax = plt.subplots()  # FIXME (Needs to loop) BEGIN
+    ax_facecolor = ax.get_facecolor()
 
     # | axs = ax.twinx() # FIXME https://github.com/matplotlib/matplotlib/issues/16405
     # | axs.get_yaxis().set_major_locator(plt.NullLocator())
@@ -144,13 +146,9 @@ for country in countries:
 
     plt.title(f"{country} COVID-19 Cases as of {latest_date_str} UTC EOD, JHU CSSE Data")
 
-    def plot_markers():
-        for status in statuses:
-            df = data[country][status].iloc[-(n_days_back_plot + 1):]
-            ax.semilogy(df.index.to_pydatetime(), df['count'], '.', color=marker_color[status], markersize=markersize)
-
-
-    plot_markers()  # plot the markers and set the axes
+    for status in statuses:
+        df = data[country][status].iloc[-(n_days_back_plot + 1):]
+        ax.semilogy(df.index.to_pydatetime(), df['count'], '.', color=marker_color[status], markersize=markersize, zorder=1)
 
     for status in statuses:
         df = data[country][status]
@@ -164,13 +162,13 @@ for country in countries:
             annotation_count = f"{int(rge['count'][index] + 0.5):,}"
             annotation = f"{annotation_count}\n{annotation_date}"
             va = 'center'
+            alpha = 0.65
             if index == -3 and df.iloc[-3]['count'] > 0:
                 annotation = f"{annotation}\n"
                 va = 'bottom'
-            plt.annotate(annotation, xy=(rge['dates'][index], rge['count'][index]),
-                         fontweight='bold', ha='center', va=va)
-
-    plot_markers()  # replot the markers so they are on top of the lines
+                alpha = 0.0
+            text = plt.text(rge['dates'][index], rge['count'][index], annotation, fontweight='bold', ha='center', va=va)
+            text.set_bbox({'facecolor': ax_facecolor, 'edgecolor': 'none', 'alpha': alpha})
 
     ax.get_xaxis().set_major_locator(mpl.dates.WeekdayLocator(byweekday=mpl.dates.MONDAY))
     ax.get_xaxis().set_major_formatter(mpl.dates.DateFormatter('%b %d'))
