@@ -1,0 +1,25 @@
+name: build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: goanpeca/setup-miniconda@v1
+      with:
+        auto-update-conda: true
+        auto-activate-base: true
+    - shell: bash -l {0}
+      run: |
+        python --version
+        conda env create -f environment.yaml
+        source activate covid19
+        python --version
+        conda info
+        conda list
