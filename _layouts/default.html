@@ -10,6 +10,16 @@
 
   <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
 
+  {% if site.google_analytics %}
+  <script async src="https://www.googletagmanager.com/gtag/js?id='{{ site.google_analytics }}'"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('config', '{{ site.google_analytics }}');
+    gtag('js', new Date());
+  </script>
+  {% endif %}
+
   {% if page.usemathjax %}
   <!-- https://11011110.github.io/blog/2019/10/17/mathjax-3-jekyll.html -->
   <!-- http://docs.mathjax.org/en/latest/upgrading/v2.html#changes-in-the-mathjax-api -->
@@ -41,6 +51,7 @@
   </head>
   <body>
     <div class="container-lg px-3 my-5 markdown-body">
+
       {% if site.title and site.title != page.title %}
       <h1><a href="{{ "/" | absolute_url }}">{{ site.title }}</a></h1>
       {% endif %}
@@ -48,17 +59,9 @@
       {{ content }}
 
       <div class="footer border-top border-gray-light mt-5 pt-3 text-right text-gray" />
+
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
     <script>anchors.add();</script>
-    {% if site.google_analytics %}
-    <script async src="https://www.googletagmanager.com/gtag/js?id='{{ site.google_analytics }}'"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('config', '{{ site.google_analytics }}');
-      gtag('js', new Date());
-    </script>
-    {% endif %}
   </body>
 </html>
