@@ -13,11 +13,13 @@ import seaborn as sns
 
 from sklearn.linear_model import LinearRegression
 
+from ruamel_yaml import YAML
+
 # %% Basic setup
 
 countries = [
     # This list may be overridden, below, where we choose a larger swath of countries
-    "Australia", "Austria", "Belgium", "Brazil", "Canada", "Chile", "China", "Czechia", "Denmark", "Ecuador", "Finland", "France", "Germany", "Greece", "Iceland", "Indonesia", "Iran", "Ireland", "Israel", "Italy", "Japan", "Luxembourg", "Malaysia", "Netherlands", "Norway", "Pakistan", "Poland", "Portugal", "Saudi Arabia", "South Korea", "Spain", "Sweden", "Switzerland", "Thailand", "Turkey", "US", "United Kingdom",
+    "Australia", "Austria", "Belgium", "Brazil", "Canada", "Chile", "China", "Czechia", "Denmark", "Ecuador", "Finland", "France", "Germany", "Greece", "Iceland", "Indonesia", "Iran", "Ireland", "Israel", "Italy", "Japan", "Luxembourg", "Malaysia", "Netherlands", "Norway", "Pakistan", "Poland", "Portugal", "Saudi Arabia", "South Korea", "Spain", "Sweden", "Switzerland", "Thailand", "Turkey", "United States", "United Kingdom",
 ]
 
 # %% Load the data
@@ -29,7 +31,7 @@ ts_global = {
 }
 
 for status in ts_global:
-    ts_global[status].rename(index={"Taiwan*": "Taiwan", "Korea, South": "South Korea"}, inplace=True)
+    ts_global[status].rename(index={"Taiwan*": "Taiwan", "Korea, South": "South Korea", "US": "United States"}, inplace=True)
     ts_global[status] = ts_global[status].drop(columns=['Province/State', 'Lat', 'Long']).transpose()
     ts_global[status].index = pd.to_datetime(ts_global[status].index, dayfirst=False, yearfirst=False, utc=True)
     ts_global[status] = ts_global[status].groupby(ts_global[status].columns, axis='columns').aggregate(np.sum)
@@ -39,6 +41,12 @@ statuses = sorted(list(set(ts_global) - set(['recovered'])))  # FIXME The 'recov
 
 # | # Select all countries in the data set, overriding any previous list value
 # | countries = sorted(list(set(ts_global['confirmed'].columns.tolist()) & set(ts_global['deaths'].columns.tolist())))
+
+yaml = YAML()
+yaml.default_flow_style = False
+contries_filename = "site/_data/countries.yaml"
+with open(contries_filename, 'w') as countries_file:
+    yaml.dump(countries, countries_file)
 
 data = {}
 for country in countries:

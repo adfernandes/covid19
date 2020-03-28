@@ -41,11 +41,12 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 
 Processing Markdown with Liquid gives:
 
-{% for image in site.static_files %}
-    {% if image.path contains '/plots/svg/' %}
-        {% assign country = "{{ image.path }}" | split: "/" | last | split: "." | first %}
-        * [{{ country }}]({{ image.path }}){:target="covid19_{{ country }}"}
-    {% endif %}
+{% for country in site.data.countries %}
+* [{{ country }}](plots/svg/{{ country }}.svg){:target="covid19_{{ country | downcase }}"}
 {% endfor %}
 
 Hopefully it works!
+
+# Contact
+
+You can reach me at $$\text{Andrew Fernandes}\ \email{andrew}{fernandes.org}$$.
