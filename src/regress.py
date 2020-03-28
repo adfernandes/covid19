@@ -35,6 +35,7 @@ ts_global = {
 }
 
 for status in ts_global:
+    ts_global[status].rename(index={"Taiwan*": "Taiwan"}, inplace=True)
     ts_global[status] = ts_global[status].drop(columns=['Province/State', 'Lat', 'Long']).transpose()
     ts_global[status].index = pd.to_datetime(ts_global[status].index, dayfirst=False, yearfirst=False, utc=True)
     ts_global[status] = ts_global[status].groupby(ts_global[status].columns, axis='columns').aggregate(np.sum)
@@ -96,6 +97,7 @@ regression = {}
 for country in countries:
     regression[country] = {}
     for status in statuses:
+        print(f"regressing: {country} {status}")
         regression[country][status] = regress(data[country][status])
 
 # %% Set up the plots
