@@ -27,6 +27,11 @@
   <!-- Use <script type="math/tex"> ... </script> and <script type="math/tex; mode=display"> ... </script> -->
   <script>
     MathJax = {
+        tex: {
+          macros: {
+            email: ["\\text{$\\langle\\text{#1$@$#2}\\rangle$}", 2]
+          }
+        },
         options: {
             renderActions: {
                 findScriptMathTex: [10, function (doc) {
@@ -45,7 +50,7 @@
         }
     };
   </script>
-  <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
+  <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg-full.js"></script>
   {% endif %}
 
   </head>
