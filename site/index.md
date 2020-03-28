@@ -1,6 +1,7 @@
 ---
-layout: default
+title: COVID-19 Projections
 usemathjax: true
+layout: default
 ---
 
 # Header One
