@@ -19,7 +19,7 @@ jobs:
       run: |
         python --version
         conda env create -f environment.yaml
-        source activate covid19
+        conda activate covid19
         python --version
         conda info
         conda list
