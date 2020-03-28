@@ -3,26 +3,29 @@ name: Build & Deploy
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
+  schedule:
+    - cron: '5 0-4 * * *' # UTC
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: goanpeca/setup-miniconda@v1
+    - name: Git Checkout
+      uses: actions/checkout@v2
+    - name: Setup MiniConda
+      uses: goanpeca/setup-miniconda@v1
       with:
         auto-update-conda: true
         auto-activate-base: true
-    - name: Analyze the data
+    - name: Analyze and Plot
       shell: bash -l {0}
       run: |
         rm -f site/plots/*/.gitignore
         conda env create -f environment.yaml -q
         conda activate covid19
         python src/regress.py
-    - uses: peaceiris/actions-gh-pages@v3
+    - name: Publish GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         enable_jekyll: true
