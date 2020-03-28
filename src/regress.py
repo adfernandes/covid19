@@ -119,6 +119,8 @@ line_color = {
     'recovered': palette[8],
 }
 
+site_plots = "site/plots"
+
 markersize = 16.0
 linewidth = 4.0
 
@@ -127,7 +129,7 @@ n_days_back_plot = 7 * 6
 # %% Plot the data and regressions
 
 for image_format in image_formats:
-    for file in glob.glob(f"plots/{image_format}/*.{image_format}"):
+    for file in glob.glob(f"{site_plots}/{image_format}/*.{image_format}"):
         os.remove(file)
 
 for country in countries:
@@ -193,7 +195,7 @@ for country in countries:
     fig.autofmt_xdate()
 
     for image_format in image_formats:
-        plt.savefig(f"plots/{image_format}/{country}.{image_format}", **(image_formats[image_format]))
+        plt.savefig(f"{site_plots}/{image_format}/{country}.{image_format}", **(image_formats[image_format]))
 
     plt.close()  # | plt.show()
 
