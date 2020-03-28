@@ -36,3 +36,16 @@ This is a $$x = \int\log\left(\theta\right)\,d\theta$$ math test.
 ### Header Four
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Mattis pellentesque id nibh tortor id aliquet lectus proin nibh. $$x = \int\log\left(\theta\right)\,d\theta$$ Mauris ultrices eros in cursus turpis massa. Amet mattis vulputate enim nulla aliquet porttitor lacus luctus. Mattis nunc sed blandit libero volutpat sed cras. Blandit aliquam etiam erat velit scelerisque in. Sagittis orci a scelerisque purus. Faucibus et molestie ac feugiat. Bibendum ut tristique et egestas quis ipsum suspendisse ultrices gravida \$\$x = \int\log\left(\theta\right)\,d\theta$$ nulla pellentesque dignissim enim sit amet. Fringilla phasellus faucibus scelerisque eleifend. Malesuada proin libero nunc consequat. Sit amet cursus sit amet dictum sit amet justo donec. In pellentesque massa placerat duis ultricies. Vel pretium lectus quam id. Ridiculus mus mauris vitae ultricies leo integer malesuada nunc vel. Est ultricies integer quis auctor. Enim lobortis scelerisque fermentum dui faucibus in ornare. Diam maecenas ultricies mi eget mauris pharetra et ultrices neque. Sed risus pretium quam vulputate dignissim suspendisse in.
+
+# Plots
+
+Processing Markdown with Liquid gives:
+
+{% for image in site.static_files %}
+    {% if image.path contains '/plots/svg/' %}
+        {% assign country = "{{ image.path }}" | split: "/" | last | split: "." | first %}
+        * [{{ country }}]({{ image.path }}){:target="covid19_{{ country }}"}
+    {% endif %}
+{% endfor %}
+
+Hopefully it works!
