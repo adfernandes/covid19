@@ -17,7 +17,8 @@ jobs:
         auto-activate-base: true
     - shell: bash -l {0}
       run: |
-        conda env create -f environment.yaml
+        rm -f site/plots/*/.gitignore
+        conda env create -f environment.yaml -q
         conda activate covid19
         python src/regress.py
     - uses: peaceiris/actions-gh-pages@v3
