@@ -17,4 +17,4 @@ Text can be **bold**, _italic_, or ~~strikethrough~~.
 
 This is a test.
 
-This is a $$\sin\(\theta\)$$ math test.
+This is a \$\$x = \int\left(\log(\theta\right)\,d\theta\$\$ math test.
