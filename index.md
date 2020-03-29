@@ -15,7 +15,7 @@ Warning! Some of the 'space' characters below are really unicode 'non-breaking-s
 {{ everything | array_to_sentence_string | replace: ", ", ",   " | replace: " and ", " and   " }}
 
 <div style="display: flex; flex-direction: column; border: 1pt solid LightGrey; border-left: 0; border-right: 0;">
-<iframe name="plot" style="border: none; flex-grow: 1;"></iframe>
+<iframe name="plot" id="plot" style="border: none; flex-grow: 1;"></iframe>
 </div>
 
 # What is this, and Why should I care?
