@@ -42,11 +42,19 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 Processing Markdown with Liquid gives:
 
 {% for country in site.data.countries %}
-* [{{ country }}](plots/svg/{{ country }}.svg){:target="covid19_{{ country | downcase }}"}
+* [{{ country }}](plots/svg/{{ country }}.svg){:target="plot"}
 {% endfor %}
 
 Hopefully it works!
 
+| ambrosia | gala | red delicious |
+| pink lady | jazz | macintosh |
+| honeycrisp | granny smith | fuji |
+
 # Contact
 
-You can reach me at $$\text{Andrew Fernandes}\ \email{andrew}{fernandes.org}$$.
+You can reach me at $$\text{Andrew Fernandes}\ \email{andrew}{fernandes.org}$$. This site was generated [from here]({{ site.github.repository_url }}).
+
+<div style="display: flex; flex-direction: column;">
+<iframe name="plot" style="border: none; flex-grow: 1;"></iframe>
+</div>
