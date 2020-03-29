@@ -25,7 +25,8 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 -----
 
 Special thanks to [Johns Hopkins University](https://www.jhu.edu/) and the [ESRI Living Atlas Team](https://livingatlas.arcgis.com/en/) for providing the world with such a valuable resource. Like almost every analysis online, this work was based on the [JHU CSSE Data](https://github.com/CSSEGISandData/COVID-19).
+Also, thanks and kudos to [GitHub](https://github.com/) for supporting Open Source software and research!
 
-This site is auto-generated [via GitHub repository]({{ site.github.repository_url }}) and workflow Actions.
+This site is generated from [{{ site.github.repository_url }}]({{ site.github.repository_url }}) by automated [actions](https://github.com/adfernandes/covid19/actions?query=workflow%3A%22Build%20%26%20Deploy%22).
 
 You can reach me at $$\small\text{Andrew Fernandes}\ \email{andrew}{fernandes.org}$$.
