@@ -42,12 +42,6 @@ statuses = sorted(list(set(ts_global) - set(['recovered'])))  # FIXME The 'recov
 # | # Select all countries in the data set, overriding any previous list value
 # | countries = sorted(list(set(ts_global['confirmed'].columns.tolist()) & set(ts_global['deaths'].columns.tolist())))
 
-yaml = YAML()
-yaml.default_flow_style = False
-contries_filename = "site/_data/countries.yaml"
-with open(contries_filename, 'w') as countries_file:
-    yaml.dump(countries, countries_file)
-
 data = {}
 for country in countries:
     data[country] = {}
@@ -62,15 +56,22 @@ for country in countries:
 n_days_back_fit = 9
 n_days_extrapolate = [-n_days_back_fit, 0, 7, 14]
 
+
 too_few = set()
 for country in countries:
     for status in statuses:
         if any(data[country][status]['count'][-n_days_back_fit:] < 1):
             too_few.add(country)
 print(f"too_few: {sorted(list(too_few))}")
-for remove in too_few:
-    del data[remove]
+for remove in too_few: del data[remove]
 countries = sorted(list(set(countries) - too_few))
+
+
+yaml = YAML()
+yaml.default_flow_style = False
+contries_filename = "site/_data/countries.yaml"
+with open(contries_filename, 'w') as countries_file:
+    yaml.dump(countries, countries_file)
 
 
 def regress(df: pd.DataFrame):
