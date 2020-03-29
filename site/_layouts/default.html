@@ -29,7 +29,8 @@
     MathJax = {
         tex: {
           macros: {
-            email: ["\\text{$\\sf\\langle\\text{#1@#2}\\rangle$}", 2]
+            email: ["{#1}{#2}{#3}", 3],
+            sfst: ["\\sf\\small\\text{#1}", 1]
           }
         },
         options: {
@@ -66,7 +67,7 @@
       <div class="footer border-top border-gray-light mt-5 pt-3 text-right text-gray" />
 
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.2.2/anchor.min.js" integrity="sha256-E4RlfxwyJVmkkk0szw7LYJxuPlp6evtPSBDlWHsYYL8=" crossorigin="anonymous"></script>
     <script>anchors.add();</script>
   </body>
 </html>
