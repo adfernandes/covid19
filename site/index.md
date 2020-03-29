@@ -53,7 +53,7 @@ Hopefully it works!
 
 # Contact
 
-You can reach me at $$\text{Andrew Fernandes}\ \email{andrew}{fernandes.org}$$. This site was generated [from here]({{ site.github.repository_url }}).
+You can reach me at $$\text{Andrew Fernandes}\ \email{andrew}{fernandes.org}$$. This site was generated [via GitHub]({{ site.github.repository_url }}).
 
 <div style="display: flex; flex-direction: column;">
 <iframe name="plot" style="border: none; flex-grow: 1;"></iframe>
