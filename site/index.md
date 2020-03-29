@@ -49,4 +49,4 @@ Hopefully it works!
 
 # Contact
 
-You can reach me at $$\text{Andrew Fernandes}\ \email{andrew}{fernandes.org}$$.
+You can reach me at $$\text{Andrew Fernandes}\ \email{andrew}{fernandes.org}$$. This site was generated [from here]({{ site.github.repository_url }}).
