@@ -3,58 +3,29 @@ usemathjax: true
 layout: default
 ---
 
-This is introductory text.
-
-# Header One
-
-Text can be **bold**, _italic_, or ~~strikethrough~~.
-
-## Header Two
-
-> This is a blockquote following a header.
->
-> When something is important enough, you do it even if the odds are not in your favor.
-
-### Header Three
-
-This is a test.
-
-The following is a math block:
-
-$$ a + b $$
-
-But next comes a paragraph with an inline math statement:
-
-\$$ c + d $$
-
-If you don’t even want the inline math statement, escape the first two dollar signs:
-
-\$\$ e + f $$
-
-This is a $$x = \int\log\left(\theta\right)\,d\theta$$ math test.
-
-### Header Four
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Mattis pellentesque id nibh tortor id aliquet lectus proin nibh. $$x = \int\log\left(\theta\right)\,d\theta$$ Mauris ultrices eros in cursus turpis massa. Amet mattis vulputate enim nulla aliquet porttitor lacus luctus. Mattis nunc sed blandit libero volutpat sed cras. Blandit aliquam etiam erat velit scelerisque in. Sagittis orci a scelerisque purus. Faucibus et molestie ac feugiat. Bibendum ut tristique et egestas quis ipsum suspendisse ultrices gravida \$\$x = \int\log\left(\theta\right)\,d\theta$$ nulla pellentesque dignissim enim sit amet. Fringilla phasellus faucibus scelerisque eleifend. Malesuada proin libero nunc consequat. Sit amet cursus sit amet dictum sit amet justo donec. In pellentesque massa placerat duis ultricies. Vel pretium lectus quam id. Ridiculus mus mauris vitae ultricies leo integer malesuada nunc vel. Est ultricies integer quis auctor. Enim lobortis scelerisque fermentum dui faucibus in ornare. Diam maecenas ultricies mi eget mauris pharetra et ultrices neque. Sed risus pretium quam vulputate dignissim suspendisse in.
-
-# Plots
-
-Processing Markdown with Liquid gives:
-
-{% for country in site.data.countries %}
-* [{{ country }}](plots/svg/{{ country }}.svg){:target="plot"}
+{% comment %}
+Warning! Some of the 'space' characters below are really unicode 'non-breaking-space' characters!
+{%- endcomment -%}
+{% assign everything = "" | split: "," %}
+{%- for country in site.data.countries -%}
+{%- capture country_text -%}{{ country | replace: " ", " " }}{%- endcapture -%}
+{%- capture country_html -%}[{{ country_text }}](plots/svg/{{ country }}.svg){:target="plot"}{%- endcapture -%}
+{% assign everything = country_html | concat: everything %}
 {% endfor %}
+{{ everything | array_to_sentence_string | replace: ", ", ",   " | replace: " and ", " and   " }}
 
-Hopefully it works!
-
-| ambrosia | gala | red delicious |
-| pink lady | jazz | macintosh |
-| honeycrisp | granny smith | fuji |
-
-# Contact
-
-You can reach me at $$\text{Andrew Fernandes}\ \email{andrew}{fernandes.org}$$. This site was generated [from here]({{ site.github.repository_url }}).
-
-<div style="display: flex; flex-direction: column;">
+<div style="display: flex; flex-direction: column; border: 1pt solid LightGrey; border-left: 0; border-right: 0;">
 <iframe name="plot" style="border: none; flex-grow: 1;"></iframe>
 </div>
+
+# What is this, and Why should I care?
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+-----
+
+Special thanks to [Johns Hopkins University](https://www.jhu.edu/) and the [ESRI Living Atlas Team](https://livingatlas.arcgis.com/en/) for providing the world with such a valuable resource. Like almost every analysis online, this work was based on the [JHU CSSE Data](https://github.com/CSSEGISandData/COVID-19).
+
+This site is auto-generated [via GitHub repository]({{ site.github.repository_url }}) and workflow Actions.
+
+You can reach me at $$\small\text{Andrew Fernandes}\ \email{andrew}{fernandes.org}$$.
