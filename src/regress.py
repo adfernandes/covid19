@@ -12,8 +12,11 @@ import matplotlib.patheffects as path_effects
 import seaborn as sns
 
 from sklearn.linear_model import LinearRegression
+from scipy.optimize import least_squares
 
 from ruamel_yaml import YAML
+
+original_np_seterr = np.seterr(all='raise')  # raise exceptions rather than warnings
 
 # %% The initial set of countries that we're interested in
 
@@ -52,7 +55,7 @@ for country in countries:
         data[country][status] = pd.DataFrame(ts_global[status][country]).rename(columns={country: "count"})
         data[country][status]['days'] = data[country][status].index.to_julian_date().tolist()
         data[country][status]['days'] = data[country][status]['days'] - np.min(data[country][status]['days'])
-        data[country][status]['log2count'] = np.log2(data[country][status]['count'])
+        data[country][status]['log2count'] = np.log2(data[country][status]['count'].map(lambda c: c if c > 0 else np.NaN))
 
 # %% Set the regression model training and prediction windows
 #
@@ -131,10 +134,33 @@ def regress_semilog(df: pd.DataFrame):
     return rv
 
 
+def predict_logistic(c, t, observed_max):
+    log2it = c[0] + c[1] * t
+    p = 1.0 / (1.0 + np.exp2(-log2it))
+    y_max = (1.0 + np.exp2(c[2])) * observed_max
+    y = p * y_max
+    return y
+
+
+def residuals_logistic(c, t, y, observed_max):
+    predicted_log2it = c[0] + c[1] * t
+    y_max = (1.0 + np.exp2(c[2])) * observed_max
+    observed_p = y / y_max
+    observed_log2it = np.log2(observed_p / (1.0 - observed_p))
+    residual = observed_log2it - predicted_log2it
+    return residual
+
+
 def regress_logistic(df: pd.DataFrame):
 
         df = df.iloc[-n_days_train:]
         rv = {}  # return value
+
+        count_max = df['count'].max()
+        c_guess = np.array([0, 1, -3])
+        result = least_squares(residuals_logistic, c_guess, args=(df['days'].values, df['count'].values, count_max))
+        if not result.success:
+            raise RuntimeError(f"failed to converge for reason '{result.status}': {result.message}")
 
         # TODO - START HERE
 
@@ -144,11 +170,14 @@ def regress_logistic(df: pd.DataFrame):
 # %% Do the regression calculations for all countries and statuses
 
 regression = {}
+logisticrg = {}
 for country in countries:
     regression[country] = {}
+    logisticrg[country] = {}
     for status in statuses:
-        print(f"regressing: {country} {status}")
+        print(f"regressing: {country}, status: {status}")
         regression[country][status] = regress_semilog(data[country][status])
+        logisticrg[country][status] = regress_logistic(data[country][status])
 
 # %% Set up the plots and the plotting parameters
 
@@ -185,6 +214,8 @@ for image_format in image_formats:
         os.remove(file)
 
 # %% Plot the data, regressions, and predictions for each country
+
+np.seterr(**original_np_seterr)  # plotting produces many spurious errors that are ignored by default
 
 for country in countries:
 
