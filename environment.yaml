@@ -1,22 +1,28 @@
+# Normally we would lock the versions down more,
+# but nothing here is strongly version-dependent,
+# so just lock the major version numbers for now.
+
 name: covid19
+
 channels:
   - defaults
+
 dependencies:
-  - black=19.10b0
-  - cython=0.29.15
-  - ipython=7.13.0
-  - jinja2=2.11.1
-  - jupyter=1.0.0
-  - lxml=4.5.0
-  - matplotlib=3.1.3
-  - numpy=1.18.1
-  - pandas=1.0.2
-  - pep8=1.7.1
-  - pip=20.0.2
-  - pylint=2.4.4
-  - python=3.8.1
-  - ruamel_yaml=0.15.87
-  - scikit-learn=0.22.1
-  - scipy=1.4.1
-  - seaborn=0.10.0
-  - statsmodels=0.11.0
+  - black
+  - cython
+  - ipython
+  - jinja2
+  - jupyter
+  - lxml
+  - matplotlib=3
+  - numpy=1.18
+  - pandas=1.0
+  - pep8
+  - pip
+  - pylint
+  - python=3.8
+  - ruamel_yaml
+  - scikit-learn=0.22
+  - scipy=1.4
+  - seaborn=0.10
+  - statsmodels=0.11
