@@ -54,7 +54,7 @@ for country in countries:
 # %% Fit the regression models
 
 n_days_back_fit = 9
-n_days_extrapolate = [-n_days_back_fit, 0, 7, 14]
+n_days_extrapolate = [-(n_days_back_fit-1)-7, -(n_days_back_fit-1), 0, 7, 14]
 
 
 too_few = set()
@@ -92,8 +92,8 @@ def regress(df: pd.DataFrame):
 
     return {
         'weekly_multiplier': weekly_multiplier,
-        'interpolation': {'dates': dates[0:2], 'days': days[0:2], 'log2count': log2count[0:2], 'count': count[0:2]},
-        'extrapolation': {'dates': dates[1:],  'days': days[1:],  'log2count': log2count[1:],  'count': count[1:]},
+        'interpolation': {'dates': dates[1:3], 'days': days[1:3], 'log2count': log2count[1:3], 'count': count[1:3]},
+        'extrapolation': {'dates': dates[ : ], 'days': days[ : ], 'log2count': log2count[ : ], 'count': count[ : ]},
     }
 
 
