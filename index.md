@@ -23,17 +23,19 @@ layout: default
 
 ## What do these plots show?
 
-These plots show that *covid-19*{:.sc} infections are [growing exponentially](https://youtu.be/Kas0tIxDvrg) in most of the world.
+The Internet is full of dire warnings about the upcoming surge of *covid-19*{:.sc} infections. [Article](https://www.washingtonpost.com/graphics/2020/world/corona-simulator/) after [article](https://covidactnow.org) after [article](https://www.ft.com/coronavirus-latest) warn of a huge and sudden increase in *covid-19*{:.sc} infections. For most of us, the "exponential blow-up" of the pandemic must ultimately be taken as a matter of faith.
 
+There are already several [easy to understand](https://youtu.be/fgBla7RepXU), [non-mathematical](https://youtu.be/Kas0tIxDvrg), and [simplified](https://youtu.be/gxAaO2rsdIs) online explanations of disease transmission and the growth of epidemics. But I wanted to make things _even simpler_, and remove some of the "mathematical magic" behind the dire pandemic predictions. And the simplest thing I could think of was plotting some points and drawing straight lines.
 
+The trick is to scale the number of infctions by "order of magnitude". We know that 1,000 people is ten times the magnitude of 100, and we know that 10,000 people is ten times the magnitude of 1,000. And it turns that if we plot the _magnitude_ of *covid-19*{:.sc} infections over time, it is easier to understand how the epidemic is behaving. We can use the past behavior to predict the epidemic will _likely_ behave in the future.
 
-## How do I interpret them?
+So simply plotting the data and looking at it should be enough to convince almost anyone that we should be very worried indeed.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+## How do I interpret the plots?
 
-## A few more details
+We draw a **solid** line throught the most recent (rightmost) data points. In most cases, the straight line fits those points very well. That straight line represents "pure" exponential growth in the number of *covid-19*{:.sc} cases. If you project that straight line one or two weeks into the future the numbers that get predicted can be startlingly large.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Now it **is true** that in some cases, for example Italy, where the long-term trend shows more of a curve than a straight line. That shows that the infection rate is decreasing, which is a ~~good~~ great thing. A more complex model would have you draw a curve through the points and continue on up. But note that regardless of whether the future trend is a straight line or if the line flattens out, exponential growth guarantees that a great many more infections are, to some extent, inevetable.
 
 ## Acknowledgements
 
