@@ -93,7 +93,7 @@ def regress(df: pd.DataFrame):
     return {
         'weekly_multiplier': weekly_multiplier,
         'interpolation': {'dates': dates[1:3], 'days': days[1:3], 'log2count': log2count[1:3], 'count': count[1:3]},
-        'extrapolation': {'dates': dates[ : ], 'days': days[ : ], 'log2count': log2count[ : ], 'count': count[ : ]},
+        'extrapolation': {'dates': dates[2: ], 'days': days[2: ], 'log2count': log2count[2: ], 'count': count[2: ]},
     }
 
 
