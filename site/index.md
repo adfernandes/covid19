@@ -21,11 +21,17 @@ layout: default
 
 <img id="plot" style="display: block; width: 100%; height: auto; border: 1pt solid LightGrey; border-left: 0; border-right: 0;" src="plots/empty.svg">
 
+#### <ins>Quick update!</ins>
+
+There are _more accurate_ but tricker-to-describe plots [**<ins>here</ins>**]({% link logistic.md %}) that I'm still in the process of writing up.
+
+But for the _simplest possible_ case, keep on reading, below...
+
 ## What do these plots show?
 
 The Internet is full of dire warnings about the upcoming surge of *covid-19*{:.sc} infections. [Article](https://www.washingtonpost.com/graphics/2020/world/corona-simulator/) after [article](https://covidactnow.org) after [article](https://www.ft.com/coronavirus-latest) warn of a huge and sudden increase in *covid-19*{:.sc} infections. For most of us, the "exponential blow-up" of the pandemic must ultimately be taken as a matter of faith.
 
-There are already several [easy to understand](https://youtu.be/fgBla7RepXU), [non-mathematical](https://youtu.be/Kas0tIxDvrg), and [simplified](https://youtu.be/gxAaO2rsdIs) online explanations of disease transmission and the growth of epidemics. But I wanted to make things _even simpler_, and remove some of the "mathematical magic" behind the dire pandemic predictions. And the simplest thing I could think of was plotting some points and drawing straight lines.
+There are already several [easy-to-understand](https://youtu.be/fgBla7RepXU), [non-mathematical](https://youtu.be/gxAaO2rsdIs), and [more-mathematical](https://youtu.be/Kas0tIxDvrg) online explanations of disease transmission and the growth of epidemics. But I wanted to make things _even simpler_, and remove some of the "mathematical magic" behind the dire pandemic predictions. And the simplest thing I could think of was plotting some points and drawing straight lines.
 
 The trick is to scale the number of infctions by "order of magnitude". We know that 1,000 people is ten times the magnitude of 100, and we know that 10,000 people is ten times the magnitude of 1,000. And it turns that if we plot the _magnitude_ of *covid-19*{:.sc} infections over time, it is easier to understand how the epidemic is behaving. We can use the past behavior to predict the epidemic will _likely_ behave in the future.
 

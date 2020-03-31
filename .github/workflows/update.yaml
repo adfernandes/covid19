@@ -7,23 +7,34 @@ on:
     - cron: '5 0-4 * * *' # UTC
 
 jobs:
+
   build:
+
     runs-on: ubuntu-latest
+
     steps:
+
     - name: Git Checkout
       uses: actions/checkout@v2
+
     - name: Setup MiniConda
       uses: goanpeca/setup-miniconda@v1
       with:
         auto-update-conda: true
         auto-activate-base: true
+
     - name: Analyze and Plot
       shell: bash -l {0}
       run: |
-        find site -name .gitignore -exec rm {} \;
         conda env create -f environment.yaml -q
         conda activate covid19
         python src/regress.py
+
+    - name: Prepare to Publish
+      shell: bash -l {0}
+      run: |
+        find site -name .gitignore -exec rm -v {} \;
+
     - name: Publish GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:

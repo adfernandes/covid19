@@ -196,6 +196,7 @@ def regress_logistic(df: pd.DataFrame):
 
         rv['weekly_multiplier'] = rv['extrapolation']['count'][7] / rv['extrapolation']['count'][0]
         rv['expected_maximum'] = (1.0 + np.exp2(c[2])) * observed_max
+        rv['observed_maximum'] = observed_max
 
         return rv
 
@@ -321,7 +322,8 @@ for model, regression in models.items():
             line_label = f"{regression[country][status]['weekly_multiplier']:.1f} $\\times$ per week"
             if 'expected_maximum' in regression[country][status]:
                 expected_maximum = regression[country][status]['expected_maximum']
-                if expected_maximum < 1.25 * regression[country]['confirmed']['expected_maximum']:
+                observed_maximum = regression[country][status]['observed_maximum']
+                if expected_maximum < 10.0 * observed_maximum:
                     expected_maximum = int(expected_maximum + 0.5)
                     expected_maximum = f"{expected_maximum:,}"
                     line_label = f"{line_label}\n{expected_maximum} maximum"
