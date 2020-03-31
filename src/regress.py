@@ -101,7 +101,7 @@ with open(countries_filename, 'w') as countries_file:
     yaml.dump(countries, countries_file)
 
 
-# %% Define the regression functions
+# %% Define the exponential regression model
 
 def regress_semilog(df: pd.DataFrame):
 
@@ -134,6 +134,21 @@ def regress_semilog(df: pd.DataFrame):
     return rv
 
 
+# %% Define the logistic regression model
+#
+# Note that the parameterization of the logistic regression model
+# is a little different than what is normally presented.
+#
+# Specifically, choose a parameterization that allows us to use
+# unconstrained optimization. So the population count "theoretical
+# maximum" of `y_max` is `(1.0 + np.exp2(c[2])) * observed_max`,
+# for example.
+#
+# Also, just as exponential regression, where the residuals are
+# computed in log-space, for this logistic regression the residuals
+# are computed in "logit" space coordinates.
+
+
 def predict_logistic(c, t, observed_max):
     log2it = c[0] + c[1] * t
     p = 1.0 / (1.0 + np.exp2(-log2it))
@@ -156,9 +171,9 @@ def regress_logistic(df: pd.DataFrame):
         df = df.iloc[-n_days_train:]
         rv = {}  # return value
 
-        count_max = df['count'].max()
+        observed_max = df['count'].max()
         c_guess = np.array([0, 1, -3])
-        result = least_squares(residuals_logistic, c_guess, args=(df['days'].values, df['count'].values, count_max))
+        result = least_squares(residuals_logistic, c_guess, args=(df['days'].values, df['count'].values, observed_max))
         if not result.success:
             raise RuntimeError(f"failed to converge for reason '{result.status}': {result.message}")
 
@@ -171,26 +186,31 @@ def regress_logistic(df: pd.DataFrame):
             rv[which] = {}
             rv[which]['days'] = df.iloc[-1]['days'] + offsets
             rv[which]['dates'] = df.index[-1] + (df.index.freq * offsets)
-            rv[which]['count'] = predict_logistic(coeff, np.array(rv[which]['days']), count_max)
+            rv[which]['count'] = predict_logistic(coeff, np.array(rv[which]['days']), observed_max)
             rv[which]['log2count'] = np.log2(rv[which]['count'])
 
-        predict(rv, 'interpolation', result.x, days_offset_train)
-        predict(rv, 'extrapolation', result.x, days_offset_predict)
+        c = result.x
+
+        predict(rv, 'interpolation', c, days_offset_train)
+        predict(rv, 'extrapolation', c, days_offset_predict)
+
+        rv['weekly_multiplier'] = rv['extrapolation']['count'][7] / rv['extrapolation']['count'][0]
+        rv['expected_maximum'] = (1.0 + np.exp2(c[2])) * observed_max
 
         return rv
 
 
 # %% Do the regression calculations for all countries and statuses
 
-regression = {}
-logisticrg = {}
+exponential = {}
+logistic = {}
 for country in countries:
-    regression[country] = {}
-    logisticrg[country] = {}
+    exponential[country] = {}
+    logistic[country] = {}
     for status in statuses:
         print(f"regressing: {country}, status: {status}")
-        regression[country][status] = regress_semilog(data[country][status])
-        logisticrg[country][status] = regress_logistic(data[country][status])
+        exponential[country][status] = regress_semilog(data[country][status])
+        logistic[country][status] = regress_logistic(data[country][status])
 
 # %% Set up the plots and the plotting parameters
 
@@ -251,13 +271,13 @@ for country in countries:
     # Plot the interpolating, predicted line
     #
     for status in statuses:
-        rgi = regression[country][status]['interpolation']
+        rgi = exponential[country][status]['interpolation']
         ax.semilogy(rgi['dates'], rgi['count'], color=line_color[status], linestyle='-', linewidth=line_width)
 
     # Plot the extrapolated, predicted line
     #
     for status in statuses:
-        rge = regression[country][status]['extrapolation']
+        rge = exponential[country][status]['extrapolation']
         ax.semilogy(rge['dates'], rge['count'], color=line_color[status], linestyle=':', linewidth=line_width)
 
         for index in days_offset_predict_label:
@@ -290,7 +310,7 @@ for country in countries:
 
     legend_labels = [label.title() for label in statuses]
     for status in statuses:
-        legend_labels.append(f"{regression[country][status]['weekly_multiplier']:.1f} $\\times$ per week")
+        legend_labels.append(f"{exponential[country][status]['weekly_multiplier']:.1f} $\\times$ per week")
     fig.legend(legend_labels, ncol=2, frameon=False, prop={'weight': 'bold'}, loc='upper left', bbox_to_anchor=(0, 1), bbox_transform=ax.transAxes)
 
     fig.autofmt_xdate()
