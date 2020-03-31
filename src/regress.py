@@ -24,6 +24,8 @@ countries = ["Australia", "Austria", "Belgium", "Brazil", "Canada", "Chile", "Ch
 
 use_all_countries = False  # if set to 'True', reset 'countries' to all countries found in the data, after the data is loaded
 
+us_states = ['California', 'New York', 'Washington'];  # cherrypick these states from the NY Times US Data Set
+
 statuses = ['confirmed', 'deaths']  # leave out 'recovered' for now since they are less informative and make the plots confusing
 
 # %% Load the data from the external repository
@@ -33,6 +35,8 @@ ts_global = {
     'deaths':    pd.read_csv("https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv", header=0, index_col=1),
     'recovered': pd.read_csv("https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv", header=0, index_col=1),
 }
+
+ts_nytimes = pd.read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv", header=0, index_col=0)
 
 # %% Normalize the time-series data, summing across all 'Province/State' entries of each 'Country/Region'
 
@@ -45,6 +49,29 @@ for status in ts_global:
 
 if use_all_countries:
     countries = sorted(list(set(ts_global['confirmed'].columns.tolist()) & set(ts_global['deaths'].columns.tolist())))
+
+ts_nytimes.index = pd.to_datetime(ts_nytimes.index, dayfirst=False, yearfirst=False, utc=True)
+ts_nytimes = ts_nytimes.drop(columns=['fips'])
+ts_nytimes = ts_nytimes.groupby(ts_nytimes.columns, axis='columns').aggregate(np.sum)
+
+for us_state in us_states:
+    us_state_name = f"US@{us_state}"
+    ts_global['confirmed'][us_state_name] = ts_nytimes.loc[ts_nytimes['state'] == us_state]['cases']
+    ts_global['deaths'   ][us_state_name] = ts_nytimes.loc[ts_nytimes['state'] == us_state]['deaths']
+    countries.append(us_state_name)
+
+
+def fix_us_sorting(countries):
+    """Ensure that US States sort with the 'United States' country name"""
+    def mangle(string):
+        if string == "United States":
+            return "United States zzzzzzz"
+        else:
+            return string.replace("US@", "United States ")
+    return sorted(countries, key=mangle)
+
+
+countries = fix_us_sorting(countries)
 
 # %% Split the global time-series data by country then by status
 
@@ -86,7 +113,7 @@ print(f"too_few: {sorted(list(too_few))}")
 for remove in too_few:
     del data[remove]
 
-countries = sorted(list(set(countries) - too_few))
+countries = fix_us_sorting(sorted(list(set(countries) - too_few)))
 
 # %% Save the country list for external use
 
@@ -268,7 +295,8 @@ for model, regression in models.items():
         latest_date = max([data[country][status].index[-1].to_pydatetime().date() for status in statuses])
         latest_date_str = latest_date.strftime('%B %d, %Y')
 
-        plt.title(f"{country} COVID-19 Cases as of {latest_date_str} UTC EOD, JHU CSSE Data")
+        country_title = country.replace("US@", "US | ")
+        plt.title(f"{country_title} COVID-19 Cases as of {latest_date_str} UTC EOD, JHU CSSE Data")
 
         # Plot the actual observations as markers, limited to the selected most-recent days
         #

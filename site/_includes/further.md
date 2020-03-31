@@ -1,4 +1,6 @@
-The Internet is full of dire warnings about the upcoming surge of *covid-19*{:.sc} infections. [Article](https://www.washingtonpost.com/graphics/2020/world/corona-simulator/) after [article](https://covidactnow.org) after [article](https://www.ft.com/coronavirus-latest) warn of a huge and sudden increase in *covid-19*{:.sc} infections. For most of us, the "exponential blow-up" of the pandemic must ultimately be taken as a matter of faith.
+A wonderful, well-rounded pimer has been written by [Ars Technica](https://arstechnica.com/science/2020/03/dont-panic-the-comprehensive-ars-technica-guide-to-the-coronavirus/).
+
+The Internet is full of dire warnings about the upcoming surge of *SARS-CoV-2*{:.sc} infections. [Article](https://www.washingtonpost.com/graphics/2020/world/corona-simulator/) after [article](https://covidactnow.org) after [article](https://www.ft.com/coronavirus-latest) warn of a huge and sudden increase in *SARS-CoV-2*{:.sc} infections. For most of us, the "exponential blow-up" of the pandemic must ultimately be taken as a matter of faith.
 
 There are already several [easy-to-understand](https://youtu.be/fgBla7RepXU), [non-mathematical](https://youtu.be/gxAaO2rsdIs), and [more-mathematical](https://youtu.be/Kas0tIxDvrg) online explanations of disease transmission and the growth of epidemics. But I wanted to make things _even simpler_, and remove some of the "mathematical magic" behind the dire pandemic predictions. And the simplest thing I could think of was plotting some points and drawing straight lines.
 
