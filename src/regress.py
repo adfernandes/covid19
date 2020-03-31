@@ -162,7 +162,20 @@ def regress_logistic(df: pd.DataFrame):
         if not result.success:
             raise RuntimeError(f"failed to converge for reason '{result.status}': {result.message}")
 
-        # TODO - START HERE
+        def predict(rv: dict, which: str, coeff: np.array, offsets: np.array) -> None:
+            """
+            :param rv: where to place the resulting dict
+            :param which: one of 'interpolation' or 'extrapolation'
+            :param offsets: the array of day offsets which to predict
+            """
+            rv[which] = {}
+            rv[which]['days'] = df.iloc[-1]['days'] + offsets
+            rv[which]['dates'] = df.index[-1] + (df.index.freq * offsets)
+            rv[which]['count'] = predict_logistic(coeff, np.array(rv[which]['days']), count_max)
+            rv[which]['log2count'] = np.log2(rv[which]['count'])
+
+        predict(rv, 'interpolation', result.x, days_offset_train)
+        predict(rv, 'extrapolation', result.x, days_offset_predict)
 
         return rv
 
