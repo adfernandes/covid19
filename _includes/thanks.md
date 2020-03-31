@@ -1,5 +1,8 @@
 Special thanks to [Johns Hopkins University](https://www.jhu.edu/) and the [ESRI Living Atlas Team](https://livingatlas.arcgis.com/en/) for providing the world with such a valuable resource. Like almost every analysis online, this work was based on the [JHU CSSE Data](https://github.com/CSSEGISandData/COVID-19).
-Also, thanks and kudos to [GitHub](https://github.com/) for supporting Open Source software and research!
+
+United States state-level data is generously provided by the [New York Times](https://www.nytimes.com/interactive/2020/us/coronavirus-us-cases.html).
+
+Kudos to [GitHub](https://github.com/) for supporting Open Source software and research!
 
 [![License: CC BY 4.0](https://img.shields.io/github/license/adfernandes/covid19?color=orange&label=License&logo=Creative%20Commons&logoColor=white){: style="vertical-align: middle;"}](https://creativecommons.org/licenses/by/4.0/) This work is licensed under a [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
 
