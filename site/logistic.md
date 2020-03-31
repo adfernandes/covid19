@@ -11,9 +11,7 @@ Assuming **Continued Physical Distancing**
 
 {% include show.md %}
 
-The curves show the best-fit [logistic growth model](https://youtu.be/Kas0tIxDvrg) which estimates both how quickly we expect to see new occurrences, and what the long-term maximum numbers are likely to be.
-
-The [logistic growth model](https://youtu.be/Kas0tIxDvrg) is more appropriate when we have **continued physical distancing** since, under that scenario, transmission of *SARS-CoV-2*{:.sc} is considerably slowed.
+The curves show the best-fit [logistic growth model](https://youtu.be/Kas0tIxDvrg) which estimates both how quickly we expect to see new occurrences, and what the long-term maximum numbers are likely to be. The [logistic growth model](https://youtu.be/Kas0tIxDvrg) is more appropriate when we have **continued physical distancing** since, under that scenario, transmission of *SARS-CoV-2*{:.sc} is considerably slowed.
 
 Notice that continued physical distancing gives **much more optimistic** infection counts than the alternate, more pessimistic [exponential growth]({% link exponential.md %}) scenario!
 

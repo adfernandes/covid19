@@ -296,7 +296,8 @@ for model, regression in models.items():
         latest_date_str = latest_date.strftime('%B %d, %Y')
 
         country_title = country.replace("US@", "US | ")
-        plt.title(f"{country_title} COVID-19 Cases as of {latest_date_str} UTC EOD, JHU CSSE Data")
+        data_source = "JHU CSSE" if not country_title.startswith("US | ") else "NY Times"
+        plt.title(f"{country_title} COVID-19 Cases as of {latest_date_str} UTC EOD, {data_source} Data")
 
         # Plot the actual observations as markers, limited to the selected most-recent days
         #
