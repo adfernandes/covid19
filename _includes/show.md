@@ -4,4 +4,6 @@ Because these are cumulative counts, they never go down. Fortunately, when the l
 
 Remember, testing for *SARS-CoV-2*{:.sc} is very sporadic. So the population counts are [_confounded_](https://en.wikipedia.org/wiki/Confounding) with both the availability of testing kits and strongly-regional policies about who gets tested at what time for what reason. So both "confirmed" and "deaths" counts are likely _vaslty understated_, with the death count being even more artificially low than the "confirmed" case count.
 
+This is **so** important that it's worth restating. **The lack of pervasive, systematic testing**, in the United States as well as elsewhere, make these numbers **erroneously optimistic**, and nobody knows if that optimisim is only a little-bit wrong or if it is **hugely** wrong.
+
 That's why testing, which is missing in much of the world, is so important.
