@@ -20,8 +20,7 @@ jobs:
     - name: Analyze and Plot
       shell: bash -l {0}
       run: |
-        rm -f site/_data/.gitignore
-        rm -f site/plots/*/.gitignore
+        find site -name .gitignore -exec rm {} \;
         conda env create -f environment.yaml -q
         conda activate covid19
         python src/regress.py
