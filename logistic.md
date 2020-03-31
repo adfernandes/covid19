@@ -3,7 +3,7 @@ usemathjax: true
 layout: default
 ---
 
-**Continued Physical Distancing**
+Assuming **Continued Physical Distancing**
 
 {% include plots.md model="logistic" %}
 
@@ -23,7 +23,7 @@ Notice that continued physical distancing gives **much more optimistic** infecti
 
 ## Statistical Details
 
-The population counts were fit via ordinary least squares in "logit" space to a
+The population counts were fit via unweighted ordinary least squares in "logit" space to a
 
 $$ \log_2\left(\frac{n/n_{\text{max}}}{1 - n/n_{\text{max}}}\right) = \beta_0 + \beta_1\cdot t$$
 

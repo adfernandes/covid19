@@ -3,7 +3,7 @@ usemathjax: true
 layout: default
 ---
 
-**<ins>Dis</ins>continued Physical Distancing**
+Assuming **<ins>Dis</ins>continued Physical Distancing**
 
 {% include plots.md model="exponential" %}
 
