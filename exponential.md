@@ -11,9 +11,7 @@ Assuming **<ins>Dis</ins>continued Physical Distancing**
 
 {% include show.md %}
 
-The curves show the best-fit [exponential growth model](https://youtu.be/Kas0tIxDvrg) which estimates both how quickly we expect to see new occurrences, under the hopefully-incorrect assumption that we are _nowhere near_ the end of the pandemic.
-
-The [exponential growth model](https://youtu.be/Kas0tIxDvrg) is more appropriate when we have **<ins>dis</ins>continued physical distancing** since, under that scenario, transmission of *SARS-CoV-2*{:.sc} is considerably more rapid and can theoretically infect _everybody_, in an "infinite population" sense.
+The curves show the best-fit [exponential growth model](https://youtu.be/Kas0tIxDvrg) which estimates both how quickly we expect to see new occurrences, under the hopefully-incorrect assumption that we are _nowhere near_ the end of the pandemic. The [exponential growth model](https://youtu.be/Kas0tIxDvrg) is more appropriate when we have **<ins>dis</ins>continued physical distancing** since, under that scenario, transmission of *SARS-CoV-2*{:.sc} is considerably more rapid and can theoretically infect _everybody_, in an "infinite population" sense.
 
 Notice that <ins>dis</ins>continued physical distancing gives **much more pessimistic** infection counts than the alternate, more optimistic [logistic growth]({% link logistic.md %}) scenario!
 
