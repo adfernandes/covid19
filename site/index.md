@@ -13,7 +13,7 @@ layout: default
 {%- assign everything = "" | split: "," -%}
 {%- for country in site.data.countries -%}
 {%- capture country_text -%}{{ country | replace: " ", "&nbsp;" }}{%- endcapture -%}
-{%- capture country_html -%}[{{ country_text }}](#0){:onClick="return setPlotSrc('plots/svg/{{ country }}.svg');"}{%- endcapture -%}
+{%- capture country_html -%}[{{ country_text }}](#0){:onClick="return setPlotSrc('plots/exponential/svg/{{ country }}.svg');"}{%- endcapture -%}
 {% assign everything = country_html | concat: everything %}
 {% endfor %}
 

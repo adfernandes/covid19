@@ -135,7 +135,7 @@ def regress_semilog(df: pd.DataFrame):
 
 
 # %% Define the logistic regression model
-#
+
 # Note that the parameterization of the logistic regression model
 # is a little different than what is normally presented.
 #
@@ -234,93 +234,108 @@ marker_size = 16.0
 
 plt.rcParams['figure.figsize'] = [11, 8.5]
 
-site_plots = "site/plots"
 
 image_formats = {'svg': {}, 'pdf': {}, 'png': {'dpi': 300}}
 
 n_days_back_plot = 7 * 6  # only plot this many of the most-recent days
 
+site_plots_directory = "site/plots"
+
 # %% Remove any old plots so that outdated ones don't accidentally survive
 
 for image_format in image_formats:
-    for file in glob.glob(f"{site_plots}/{image_format}/*.{image_format}"):
+    for file in glob.glob(f"{site_plots_directory}/*/{image_format}/*.{image_format}"):
         os.remove(file)
 
 # %% Plot the data, regressions, and predictions for each country
 
 np.seterr(**original_np_seterr)  # plotting produces many spurious errors that are ignored by default
 
-for country in countries:
+models = {'exponential': exponential, 'logistic': logistic}
 
-    print(f"plotting: {country}")
+for model, regression in models.items():
 
-    fig, ax = plt.subplots()
-    ax_facecolor = ax.get_facecolor()
+    site_plots_model_directory = f"{site_plots_directory}/{model}"
 
-    latest_date = max([data[country][status].index[-1].to_pydatetime().date() for status in statuses])
-    latest_date_str = latest_date.strftime('%B %d, %Y')
+    for country in countries:
 
-    plt.title(f"{country} COVID-19 Cases as of {latest_date_str} UTC EOD, JHU CSSE Data")
+        print(f"plotting: {country}")
 
-    # Plot the actual observations as markers, limited to the selected most-recent days
-    #
-    for status in statuses:
-        df = data[country][status].iloc[-n_days_back_plot:]
-        ax.semilogy(df.index.to_pydatetime(), df['count'], '.', color=marker_color[status], markersize=marker_size)
+        fig, ax = plt.subplots()
+        ax_facecolor = ax.get_facecolor()
 
-    # Plot the interpolating, predicted line
-    #
-    for status in statuses:
-        rgi = exponential[country][status]['interpolation']
-        ax.semilogy(rgi['dates'], rgi['count'], color=line_color[status], linestyle='-', linewidth=line_width)
+        latest_date = max([data[country][status].index[-1].to_pydatetime().date() for status in statuses])
+        latest_date_str = latest_date.strftime('%B %d, %Y')
 
-    # Plot the extrapolated, predicted line
-    #
-    for status in statuses:
-        rge = exponential[country][status]['extrapolation']
-        ax.semilogy(rge['dates'], rge['count'], color=line_color[status], linestyle=':', linewidth=line_width)
+        plt.title(f"{country} COVID-19 Cases as of {latest_date_str} UTC EOD, JHU CSSE Data")
 
-        for index in days_offset_predict_label:
+        # Plot the actual observations as markers, limited to the selected most-recent days
+        #
+        for status in statuses:
+            df = data[country][status].iloc[-n_days_back_plot:]
+            ax.semilogy(df.index.to_pydatetime(), df['count'], '.', color=marker_color[status], markersize=marker_size)
 
-            label_date = rge['dates'][index].to_pydatetime().date().strftime('%b %d')
-            label_count = f"{int(rge['count'][index] + 0.5):,}"
-            annotation = f"{label_count}\n{label_date}"
-            va = 'center'  # vertical alignment
-            alpha = 0.65
+        # Plot the interpolating, predicted line
+        #
+        for status in statuses:
+            rgi = regression[country][status]['interpolation']
+            ax.semilogy(rgi['dates'], rgi['count'], color=line_color[status], linestyle='-', linewidth=line_width)
 
-            if index == 0:
-                annotation = f"{annotation}\n"
-                va = 'bottom'  # vertical alignment
-                alpha = 0.0
+        # Plot the extrapolated, predicted line
+        #
+        for status in statuses:
+            rge = regression[country][status]['extrapolation']
+            ax.semilogy(rge['dates'], rge['count'], color=line_color[status], linestyle=':', linewidth=line_width)
 
-            text = plt.text(rge['dates'][index], rge['count'][index], annotation, fontweight='bold', ha='center', va=va)
-            text.set_bbox({'facecolor': ax_facecolor, 'edgecolor': 'none', 'alpha': alpha})
+            for index in days_offset_predict_label:
 
-    ax.get_xaxis().set_major_locator(mpl.dates.WeekdayLocator(byweekday=mpl.dates.MONDAY))
-    ax.get_xaxis().set_major_formatter(mpl.dates.DateFormatter('%b %d'))
-    ax.set_xlabel(f"Date", labelpad=12)
+                label_date = rge['dates'][index].to_pydatetime().date().strftime('%b %d')
+                label_count = f"{int(rge['count'][index] + 0.5):,}"
+                annotation = f"{label_count}\n{label_date}"
+                va = 'center'  # vertical alignment
+                alpha = 0.65
 
-    ax.set_ylim(ymin=1)
-    ax.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
-    ax.set_ylabel("People")
+                if index == 0:
+                    annotation = f"{annotation}\n"
+                    va = 'bottom'  # vertical alignment
+                    alpha = 0.0
 
-    plt.grid(b=True, which='major', axis='x', linewidth=1.0)
-    plt.grid(b=True, which='major', axis='y', linewidth=1.0)
-    plt.grid(b=True, which='minor', axis='y', linewidth=0.5)
+                text = plt.text(rge['dates'][index], rge['count'][index], annotation, fontweight='bold', ha='center', va=va)
+                text.set_bbox({'facecolor': ax_facecolor, 'edgecolor': 'none', 'alpha': alpha})
 
-    legend_labels = [label.title() for label in statuses]
-    for status in statuses:
-        legend_labels.append(f"{exponential[country][status]['weekly_multiplier']:.1f} $\\times$ per week")
-    fig.legend(legend_labels, ncol=2, frameon=False, prop={'weight': 'bold'}, loc='upper left', bbox_to_anchor=(0, 1), bbox_transform=ax.transAxes)
+        ax.get_xaxis().set_major_locator(mpl.dates.WeekdayLocator(byweekday=mpl.dates.MONDAY))
+        ax.get_xaxis().set_major_formatter(mpl.dates.DateFormatter('%b %d'))
+        ax.set_xlabel(f"Date", labelpad=12)
 
-    fig.autofmt_xdate()
+        ax.set_ylim(ymin=1)
+        ax.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
+        ax.set_ylabel("People")
 
-    for image_format in image_formats:
-        plt.savefig(f"{site_plots}/{image_format}/{country}.{image_format}", **(image_formats[image_format]))
+        plt.grid(b=True, which='major', axis='x', linewidth=1.0)
+        plt.grid(b=True, which='major', axis='y', linewidth=1.0)
+        plt.grid(b=True, which='minor', axis='y', linewidth=0.5)
 
-    if plt.isinteractive():
-        plt.show()
-    else:
-        plt.close()
+        legend_labels = [label.title() for label in statuses]
+        label_spacing = 1.0 if model == 'logistic' else None
+        for status in statuses:
+            line_label = f"{regression[country][status]['weekly_multiplier']:.1f} $\\times$ per week"
+            if 'expected_maximum' in regression[country][status]:
+                expected_maximum = regression[country][status]['expected_maximum']
+                if expected_maximum < 1.25 * regression[country]['confirmed']['expected_maximum']:
+                    expected_maximum = int(expected_maximum + 0.5)
+                    expected_maximum = f"{expected_maximum:,}"
+                    line_label = f"{line_label}\n{expected_maximum} maximum"
+            legend_labels.append(line_label)
+        fig.legend(legend_labels, ncol=2, labelspacing=label_spacing, frameon=False, prop={'weight': 'bold'}, loc='upper left', bbox_to_anchor=(0, 1), bbox_transform=ax.transAxes)
+
+        fig.autofmt_xdate()
+
+        for image_format in image_formats:
+            plt.savefig(f"{site_plots_model_directory}/{image_format}/{country}.{image_format}", **(image_formats[image_format]))
+
+        if plt.isinteractive():
+            plt.show()
+        else:
+            plt.close()
 
 # %% Done
