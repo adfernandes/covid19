@@ -24,7 +24,7 @@ countries = ["Australia", "Austria", "Belgium", "Brazil", "Canada", "Chile", "Ch
 
 use_all_countries = False  # if set to 'True', reset 'countries' to all countries found in the data, after the data is loaded
 
-us_states = ['California', 'New York', 'Washington'];  # cherrypick these states from the NY Times US Data Set
+us_states = ["California", "New York", "Washington", "Florida"];  # cherrypick these states from the NY Times US Data Set
 
 statuses = ['confirmed', 'deaths']  # leave out 'recovered' for now since they are less informative and make the plots confusing
 
