@@ -132,6 +132,7 @@ with open(countries_filename, 'w') as countries_file:
 
 def regress_semilog(df: pd.DataFrame):
 
+    df = df.loc[np.isfinite(df['count'])]
     df = df.iloc[-n_days_train:]
     rv = {}  # return value
 
@@ -195,6 +196,7 @@ def residuals_logistic(c, t, y, observed_max):
 
 def regress_logistic(df: pd.DataFrame):
 
+        df = df.loc[np.isfinite(df['count'])]
         df = df.iloc[-n_days_train:]
         rv = {}  # return value
 
