@@ -3,7 +3,10 @@ usemathjax: true
 layout: default
 ---
 
-Assuming **Continued Physical Distancing**
+<p style="text-align: left;">
+    Assuming <b>Continued Physical Distancing</b>
+    <span style="float: right; font-size: small;">(<a href="exponential.html">Here</a>&nbsp;is&nbsp;<ins>Dis</ins>continued&nbsp;Distancing)</span>
+</p>
 
 {% include plots.md model="logistic" %}
 

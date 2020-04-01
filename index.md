@@ -1,4 +1,3 @@
 ---
-layout:   redirect
-redirect: logistic.html
+redirect_to: logistic
 ---

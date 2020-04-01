@@ -3,7 +3,10 @@ usemathjax: true
 layout: default
 ---
 
-Assuming **<ins>Dis</ins>continued Physical Distancing**
+<p style="text-align: left;">
+    Assuming <b><ins>Dis</ins>continued Physical Distancing</b>
+    <span style="float: right; font-size: small;">(<a href="logistic.html">Here</a>&nbsp;is&nbsp;Continued&nbsp;Distancing)</span>
+</p>
 
 {% include plots.md model="exponential" %}
 
@@ -34,7 +37,7 @@ $$ \log_2\left(n\right) = \beta_0 + \beta_1\cdot t$$
 
 model, where $$t$$ is the time in days and $$n$$ is the number of people. The number of days used to fit the model parameters was chosen by inspection. The same number of days were used for all countries and populations, and is depicted on the plots by the solid line interpolants.
 
-After a _lot_ of inspection and haggling with statistician and biologist colleagues, a simple linear weighing scheme was chosen to reflect the fact that more recent observations really should be granted slightly more evidentiary weight than those in the past. As with all hyperparmeter tuning, the devil is in the details, so... _caveat emptor_.
+After a _lot_ of inspection and haggling with statistician and biologist colleagues, a simple linear weighing scheme was chosen to reflect the fact that more recent observations really should be granted slightly more evidentiary weight than those in the past. As with all hyperparmeter tuning, the devil is in the details, so&hellip;&nbsp;_caveat emptor_.
 
 ## Acknowledgements
 
