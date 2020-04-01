@@ -6,11 +6,19 @@ theme: jekyll-theme-primer
 kramdown:
     math_engine: mathjax
 
+plugins:
+  - jekyll-redirect-from
+
+whitelist:
+  - jekyll-redirect-from
+
 exclude:
   - CHANGELOG.md
   - CNAME
   - Dockerfile
   - Gemfile
   - Gemfile.lock
+  - README
   - LICENSE
   - README.md
+  - LICENSE.md
