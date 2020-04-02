@@ -264,7 +264,6 @@ marker_size = 16.0
 
 plt.rcParams['figure.figsize'] = [11, 8.5]
 
-
 image_formats = {'svg': {}, 'pdf': {}, 'png': {'dpi': 300}}
 
 n_days_back_plot = 7 * 6  # only plot this many of the most-recent days
@@ -280,6 +279,9 @@ for image_format in image_formats:
 # %% Plot the data, regressions, and predictions for each country
 
 np.seterr(**original_np_seterr)  # plotting produces many spurious errors that are ignored by default
+
+if not plt.isinteractive():
+    mpl.use('agg')  # otherwise the renderer is not set (https://github.com/matplotlib/matplotlib/issues/7614)
 
 models = {'exponential': exponential, 'logistic': logistic}
 
@@ -313,8 +315,9 @@ for model, regression in models.items():
             rgi = regression[country][status]['interpolation']
             ax.semilogy(rgi['dates'], rgi['count'], color=line_color[status], linestyle='-', linewidth=line_width)
 
-        # Plot the extrapolated, predicted line
+        # Plot the extrapolated, predicted line, saving the text annotation for later
         #
+        texts = {}
         for status in statuses:
             rge = regression[country][status]['extrapolation']
             ax.semilogy(rge['dates'], rge['count'], color=line_color[status], linestyle=':', linewidth=line_width)
@@ -334,6 +337,7 @@ for model, regression in models.items():
 
                 text = plt.text(rge['dates'][index], rge['count'][index], annotation, fontweight='bold', ha='center', va=va)
                 text.set_bbox({'boxstyle': 'round', 'facecolor': ax_facecolor, 'edgecolor': 'none', 'alpha': alpha})
+                texts[text] = (rge['dates'][index], rge['count'][index])
 
         ax.get_xaxis().set_major_locator(mpl.dates.WeekdayLocator(byweekday=mpl.dates.MONDAY))
         ax.get_xaxis().set_major_formatter(mpl.dates.DateFormatter('%b %d'))
@@ -362,6 +366,25 @@ for model, regression in models.items():
         fig.legend(legend_labels, ncol=2, labelspacing=label_spacing, frameon=False, prop={'weight': 'bold'}, loc='upper left', bbox_to_anchor=(0, 1), bbox_transform=ax.transAxes)
 
         fig.autofmt_xdate()
+
+        # Plot invisible points at the corners of all the text labels, to ensure that they are always inside the plot
+        #
+        fig.canvas.draw_idle()
+        #
+        # The following will not work until after `fig.canvas.draw()` as per https://stackoverflow.com/a/50657440
+        #
+        # Also, if you set the marker alpha > 0.0, you'll notice that they do NOT line up with the label boxes.
+        # That is because adding the new markers rescales the plot, making the locations change! Fortunately,
+        # the end result always bounds the labels within the plot, so it looks exactly as we intend!
+        #
+        for text, (text_x, text_y) in texts.items():
+            text_coords = ax.transData.inverted().transform(text.get_bbox_patch().get_window_extent())
+            text_x_min, text_x_max = (text_coords[0][0], text_coords[1][0])
+            text_y_min, text_y_max = (text_coords[0][1], text_coords[1][1])
+            text_x_min = pd.Timestamp.fromordinal(int(text_x_min // 1)) + pd.Timedelta(text_x_min % 1, unit='D')
+            text_x_max = pd.Timestamp.fromordinal(int(text_x_max // 1)) + pd.Timedelta(text_x_max % 1, unit='D')
+            text_markers = pd.DataFrame({'date': [text_x_min, text_x_max], 'count': [text_y_min, text_y_max]}).set_index('date')
+            ax.semilogy(text_markers, marker='+', color="red", markersize=marker_size, alpha=0.0)
 
         for image_format in image_formats:
             plt.savefig(f"{site_plots_model_directory}/{image_format}/{country}.{image_format}", **(image_formats[image_format]))
