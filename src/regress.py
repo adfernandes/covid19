@@ -55,7 +55,7 @@ ts_nytimes = ts_nytimes.drop(columns=['fips'])
 ts_nytimes = ts_nytimes.groupby(ts_nytimes.columns, axis='columns').aggregate(np.sum)
 
 for us_state in us_states:
-    us_state_name = f"US@{us_state}"
+    us_state_name = f"US~{us_state}"
     ts_global['confirmed'][us_state_name] = ts_nytimes.loc[ts_nytimes['state'] == us_state]['cases']
     ts_global['deaths'   ][us_state_name] = ts_nytimes.loc[ts_nytimes['state'] == us_state]['deaths']
     countries.append(us_state_name)
@@ -67,7 +67,7 @@ def fix_us_sorting(countries):
         if string == "United States":
             return "United States zzzzzzz"
         else:
-            return string.replace("US@", "United States ")
+            return string.replace("US~", "United States ")
     return sorted(countries, key=mangle)
 
 
@@ -297,7 +297,7 @@ for model, regression in models.items():
         latest_date = max([data[country][status].index[-1].to_pydatetime().date() for status in statuses])
         latest_date_str = latest_date.strftime('%B %d, %Y')
 
-        country_title = country.replace("US@", "US | ")
+        country_title = country.replace("US~", "US | ")
         data_source = "JHU CSSE" if not country_title.startswith("US | ") else "NY Times"
         plt.title(f"{country_title} COVID-19 Cases as of {latest_date_str} UTC EOD, {data_source} Data")
 
@@ -333,7 +333,7 @@ for model, regression in models.items():
                     alpha = 0.0
 
                 text = plt.text(rge['dates'][index], rge['count'][index], annotation, fontweight='bold', ha='center', va=va)
-                text.set_bbox({'facecolor': ax_facecolor, 'edgecolor': 'none', 'alpha': alpha})
+                text.set_bbox({'boxstyle': 'round', 'facecolor': ax_facecolor, 'edgecolor': 'none', 'alpha': alpha})
 
         ax.get_xaxis().set_major_locator(mpl.dates.WeekdayLocator(byweekday=mpl.dates.MONDAY))
         ax.get_xaxis().set_major_formatter(mpl.dates.DateFormatter('%b %d'))
