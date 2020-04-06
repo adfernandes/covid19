@@ -7,3 +7,9 @@ There are already several [easy-to-understand](https://youtu.be/fgBla7RepXU), [n
 The trick is to scale the number of cases by "order of magnitude". We know that 1,000 people is ten times the magnitude of 100, and we know that 10,000 people is ten times the magnitude of 1,000. And it turns that if we plot the _magnitude_ of *covid-19*{:.sc} infections over time, it is easier to understand how the epidemic is behaving. We can use the past behavior to predict the epidemic will _likely_ behave in the future.
 
 So simply plotting the data and looking at it should be enough to convince almost anyone that we should be very worried indeed. Especially since our population counts are likely [vast underestimates](https://youtu.be/mCa0JXEwDEk).
+
+So before reading _too much_ into these plots, **please** read or skim the following articles:
+* [America's *COVID-19*{:.sc} testing has stalled, and that’s a big problem](https://arstechnica.com/tech-policy/2020/04/americas-covid-19-testing-has-stalled-and-thats-a-big-problem/)
+* [Coronavirus Case Counts Are Meaningless](https://fivethirtyeight.com/features/coronavirus-case-counts-are-meaningless/)
+  - Unless you know something about testing. And even then, it gets complicated...
+* [Why It's So Freaking Hard To Make A Good *COVID-19*{:.sc} Model](https://fivethirtyeight.com/features/why-its-so-freaking-hard-to-make-a-good-covid-19-model/)
