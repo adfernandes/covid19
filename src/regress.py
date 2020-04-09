@@ -26,6 +26,8 @@ use_all_countries = False  # if set to 'True', reset 'countries' to all countrie
 
 us_states = ["California", "New York", "Washington", "Florida"];  # cherrypick these states from the NY Times US Data Set
 
+ca_provinces = ["Ontario", "Quebec"]  # cherrypick these provinces from the JHU Data Set
+
 statuses = ['confirmed', 'deaths']  # leave out 'recovered' for now since they are less informative and make the plots confusing
 
 # %% Load the data from the external repository
@@ -39,6 +41,16 @@ ts_global = {
 ts_nytimes = pd.read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv", header=0, index_col=0)
 
 # %% Normalize the time-series data, summing across all 'Province/State' entries of each 'Country/Region'
+
+ts_canada = {}
+for status in statuses:
+    ts_canada[status] = {}
+    for ca_province in ca_provinces:
+        ts_canada[status][ca_province] = ts_global[status][(ts_global[status].index == "Canada") & (ts_global[status]['Province/State'] == ca_province)]
+        ts_canada[status][ca_province] = ts_canada[status][ca_province].drop(columns=['Province/State', 'Lat', 'Long']).transpose()
+        ts_canada[status][ca_province].rename(columns={"Canada": "counts"}, inplace=True)
+        ts_canada[status][ca_province].index = pd.to_datetime(ts_canada[status][ca_province].index, dayfirst=False, yearfirst=False, utc=True)
+        ts_canada[status][ca_province] = ts_canada[status][ca_province].asfreq('D')
 
 for status in ts_global:
     ts_global[status].rename(index={"Taiwan*": "Taiwan", "Korea, South": "South Korea", "US": "United States"}, inplace=True)
@@ -60,18 +72,26 @@ for us_state in us_states:
     ts_global['deaths'   ][us_state_name] = ts_nytimes.loc[ts_nytimes['state'] == us_state]['deaths']
     countries.append(us_state_name)
 
+for ca_province in ca_provinces:
+    ca_province_name = f"CA~{ca_province}"
+    countries.append(ca_province_name)
+    for status in statuses:
+        ts_global[status][ca_province_name] = ts_canada[status][ca_province]
 
-def fix_us_sorting(countries):
+
+def fix_country_name_sorting(countries):
     """Ensure that US States sort with the 'United States' country name"""
     def mangle(string):
         if string == "United States":
             return "United States zzzzzzz"
+        elif string == "Canada":
+            return "Canada zzzzzzz"
         else:
-            return string.replace("US~", "United States ")
+            return string.replace("US~", "United States ").replace("CA~", "Canada ")
     return sorted(countries, key=mangle)
 
 
-countries = fix_us_sorting(countries)
+countries = fix_country_name_sorting(countries)
 
 # %% Split the global time-series data by country then by status
 
@@ -113,7 +133,7 @@ print(f"too_few: {sorted(list(too_few))}")
 for remove in too_few:
     del data[remove]
 
-countries = fix_us_sorting(sorted(list(set(countries) - too_few)))
+countries = fix_country_name_sorting(sorted(list(set(countries) - too_few)))
 
 # %% Save the country list for external use
 
@@ -262,9 +282,14 @@ line_color = {
 line_width = 4.0
 marker_size = 16.0
 
+plot_dpi = 300
+
 plt.rcParams['figure.figsize'] = [11, 8.5]
 
-image_formats = {'svg': {}, 'pdf': {}, 'png': {'dpi': 300}}
+plt.rcParams['savefig.dpi'] = plot_dpi
+plt.rcParams['figure.dpi'] = plot_dpi
+
+image_formats = {'svg': {}, 'pdf': {}, 'png': {'dpi': plot_dpi}}
 
 n_days_back_plot = 7 * 6  # only plot this many of the most-recent days
 
@@ -299,7 +324,7 @@ for model, regression in models.items():
         latest_date = max([data[country][status].index[-1].to_pydatetime().date() for status in statuses])
         latest_date_str = latest_date.strftime('%B %d, %Y')
 
-        country_title = country.replace("US~", "US | ")
+        country_title = country.replace("US~", "US | ").replace("CA~", "Canada | ")
         data_source = "JHU CSSE" if not country_title.startswith("US | ") else "NY Times"
         plt.title(f"{country_title} COVID-19 Cases as of {latest_date_str} UTC EOD, {data_source} Data")
 
