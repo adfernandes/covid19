@@ -330,9 +330,11 @@ for model, regression in models.items():
 
         # Plot the actual observations as markers, limited to the selected most-recent days
         #
+        y_min = 1000000000
         for status in statuses:
             df = data[country][status].iloc[-n_days_back_plot:]
             ax.semilogy(df.index.to_pydatetime(), df['count'], '.', color=marker_color[status], markersize=marker_size)
+            y_min = min(y_min, *(df['count'].tolist()))
 
         # Plot the interpolating, predicted line
         #
@@ -402,6 +404,7 @@ for model, regression in models.items():
         # That is because adding the new markers rescales the plot, making the locations change! Fortunately,
         # the end result always bounds the labels within the plot, so it looks exactly as we intend!
         #
+        y_max = 1
         for text, (text_x, text_y) in texts.items():
             text_coords = ax.transData.inverted().transform(text.get_bbox_patch().get_window_extent())
             text_x_min, text_x_max = (text_coords[0][0], text_coords[1][0])
@@ -410,6 +413,9 @@ for model, regression in models.items():
             text_x_max = pd.Timestamp.fromordinal(int(text_x_max // 1)) + pd.Timedelta(text_x_max % 1, unit='D')
             text_markers = pd.DataFrame({'date': [text_x_min, text_x_max], 'count': [text_y_min, text_y_max]}).set_index('date')
             ax.semilogy(text_markers, marker='+', color="red", markersize=marker_size, alpha=0.0)
+            y_max = max(y_max, text_y_max)
+
+        ax.set_ylim(bottom=y_min, top=y_max)
 
         for image_format in image_formats:
             plt.savefig(f"{site_plots_model_directory}/{image_format}/{country}.{image_format}", **(image_formats[image_format]))
