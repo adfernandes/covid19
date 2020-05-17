@@ -381,7 +381,7 @@ for model, regression in models.items():
         legend_labels = [label.title() for label in statuses]
         label_spacing = 1.0 if model == 'logistic' else None
         for status in statuses:
-            line_label = f"{regression[country][status]['weekly_multiplier']:.1f} $\\times$ per week"
+            line_label = f"{regression[country][status]['weekly_multiplier']:.3f} $\\times$ per week"
             if 'expected_maximum' in regression[country][status]:
                 expected_maximum = regression[country][status]['expected_maximum']
                 observed_maximum = regression[country][status]['observed_maximum']
