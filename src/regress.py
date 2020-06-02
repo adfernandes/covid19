@@ -357,7 +357,7 @@ for model, regression in models.items():
                 va = 'center'  # vertical alignment
                 alpha = 0.65
 
-                if index == 0:
+                if True or index == 0:
                     annotation = f"{annotation}\n"
                     va = 'bottom'  # vertical alignment
                     alpha = 0.0
