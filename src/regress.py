@@ -24,7 +24,7 @@ countries = ["Australia", "Austria", "Belgium", "Brazil", "Canada", "Chile", "Ch
 
 use_all_countries = False  # if set to 'True', reset 'countries' to all countries found in the data, after the data is loaded
 
-us_states = ["California", "New York", "Washington", "Florida"];  # cherrypick these states from the NY Times US Data Set
+us_states = ["California", "New York", "Texas", "Arizona", "Florida", "Washington"];  # cherrypick these states from the NY Times US Data Set
 
 ca_provinces = ["Ontario", "Quebec"]  # cherrypick these provinces from the JHU Data Set
 
